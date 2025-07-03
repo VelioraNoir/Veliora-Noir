@@ -49,7 +49,7 @@ const Header = () => {
               <span className="text-white font-playfair font-bold text-lg">VN</span>
             </div>
             <div className="hidden sm:block">
-              <span className="font-playfair text-xl font-medium text-metallic-charcoal-800 dark:text-metallic-platinum-200">
+              <span className="text-xl font-medium text-gray-800">
                 Veliora Noir
               </span>
             </div>
@@ -61,7 +61,7 @@ const Header = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-metallic-charcoal-700 dark:text-metallic-platinum-300 hover:text-metallic-gold-500 transition-colors duration-200 font-medium"
+                className="text-gray-700 hover:text-black transition-colors duration-200 font-medium"
               >
                 {item.name}
               </Link>
@@ -71,18 +71,18 @@ const Header = () => {
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <button className="p-2 text-metallic-charcoal-600 hover:text-metallic-gold-500 transition-colors duration-200">
+            <button className="p-2 text-gray-600 hover:text-black transition-colors duration-200">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
 
             {/* Wishlist */}
-            <button className="p-2 text-metallic-charcoal-600 hover:text-metallic-gold-500 transition-colors duration-200 relative">
+            <button className="p-2 text-gray-600 hover:text-black transition-colors duration-200 relative">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-metallic-gold-500 text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                 2
               </span>
             </button>
@@ -90,13 +90,13 @@ const Header = () => {
             {/* Cart */}
             <button 
               onClick={toggleCart}
-              className="p-2 text-metallic-charcoal-600 hover:text-metallic-gold-500 transition-colors duration-200 relative"
+              className="p-2 text-gray-600 hover:text-black transition-colors duration-200 relative"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6" />
               </svg>
               {isMounted && getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-metallic-gold-500 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                   {getTotalItems()}
                 </span>
               )}
@@ -104,7 +104,7 @@ const Header = () => {
 
             {/* Mobile menu button */}
             <button
-              className="lg:hidden p-2 text-metallic-charcoal-600 hover:text-metallic-gold-500 transition-colors duration-200"
+              className="lg:hidden p-2 text-gray-600 hover:text-black transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,13 +120,13 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-metallic-silver-200/30">
+          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 pt-4">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-metallic-charcoal-700 dark:text-metallic-platinum-300 hover:text-metallic-gold-500 transition-colors duration-200 font-medium py-2"
+                  className="text-gray-700 hover:text-black transition-colors duration-200 font-medium py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
