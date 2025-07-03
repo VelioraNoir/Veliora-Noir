@@ -13,6 +13,7 @@ import { useCartStore } from '../store/cartStore';
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [selectedMaterial, setSelectedMaterial] = useState('Silver');
   const [isMounted, setIsMounted] = useState(false);
+  const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const { addItem } = useCartStore();
   
   const mainImage = product.images[0];
@@ -26,11 +27,12 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
     if (mainVariant && isMounted) {
       console.log('Adding to cart:', product.title, mainVariant.available); // Debug log
       addItem(product, mainVariant.id, material || selectedMaterial);
+      
+      // Show feedback
+      setShowAddedFeedback(true);
+      setTimeout(() => setShowAddedFeedback(false), 2000);
     }
   };
-
-  // Debug log to see product data
-  console.log('Product:', product.title, 'Available:', mainVariant?.available);
 
   return (
     <div 
@@ -60,6 +62,18 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
             {mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
           </button>
         </div>
+
+        {/* Added to Cart Feedback */}
+        {showAddedFeedback && (
+          <div className="absolute inset-0 bg-green-500/90 flex items-center justify-center animate-fade-in">
+            <div className="text-white text-center">
+              <svg className="w-8 h-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-sm font-medium">Added to Cart!</p>
+            </div>
+          </div>
+        )}
 
         {/* Availability badge only - show if sold out */}
         {!mainVariant?.available && (
@@ -124,10 +138,10 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         
         <button 
           onClick={() => handleAddToCart(selectedMaterial)}
-          className={`w-full mt-4 btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-full mt-4 btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''} ${showAddedFeedback ? 'bg-green-500 text-white' : ''}`}
           disabled={!mainVariant?.available}
         >
-          {mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
+          {showAddedFeedback ? '✓ Added to Cart!' : mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
         </button>
       </div>
     </div>

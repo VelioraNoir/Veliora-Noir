@@ -274,7 +274,10 @@ export const mockProducts: Product[] = [
 // Graceful fallback function
 export async function getAllProductsWithFallback(): Promise<Product[]> {
   try {
-    return await getAllProducts();
+    console.log('Attempting to connect to Shopify store...');
+    const realProducts = await getAllProducts();
+    console.log('Successfully loaded', realProducts.length, 'products from Shopify');
+    return realProducts;
   } catch (error) {
     console.warn('Using mock data due to Shopify connection issue:', error);
     return mockProducts;

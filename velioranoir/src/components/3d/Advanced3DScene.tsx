@@ -209,25 +209,25 @@ export default function Advanced3DViewer({
 
       {/* Material Controls */}
       <div className="absolute bottom-4 left-4 right-4">
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">Material:</span>
-            <div className="flex gap-2">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-medium text-gray-700 text-center">Material:</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {materials.map((mat) => (
                 <button
                   key={mat.name}
                   onClick={() => setMaterial(mat.name)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     material === mat.name
                       ? 'bg-gray-900 text-white shadow-lg scale-105'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
                   <div 
-                    className="w-3 h-3 rounded-full border border-white"
+                    className="w-2 h-2 rounded-full border border-white flex-shrink-0"
                     style={{ backgroundColor: `#${mat.color.toString(16).padStart(6, '0')}` }}
                   />
-                  {mat.name}
+                  <span className="truncate">{mat.name}</span>
                 </button>
               ))}
             </div>
