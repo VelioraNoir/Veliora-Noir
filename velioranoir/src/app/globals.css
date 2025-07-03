@@ -1,26 +1,260 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fefefe;
+  --foreground: #1a1a1a;
+  --accent-silver: #c0c0c0;
+  --accent-gold: #d4af37;
+  --accent-platinum: #e5e4e2;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-family-playfair: 'Playfair Display', serif;
+  --font-family-inter: 'Inter', system-ui, sans-serif;
+  
+  /* Metallic color palette */
+  --color-metallic-charcoal-50: #f8f9fa;
+  --color-metallic-charcoal-100: #e9ecef;
+  --color-metallic-charcoal-200: #dee2e6;
+  --color-metallic-charcoal-300: #ced4da;
+  --color-metallic-charcoal-400: #adb5bd;
+  --color-metallic-charcoal-500: #6c757d;
+  --color-metallic-charcoal-600: #495057;
+  --color-metallic-charcoal-700: #343a40;
+  --color-metallic-charcoal-800: #212529;
+  --color-metallic-charcoal-900: #1a1d20;
+  --color-metallic-charcoal-950: #0d0f11;
+  
+  --color-metallic-platinum-50: #fefefe;
+  --color-metallic-platinum-100: #fdfdfd;
+  --color-metallic-platinum-200: #fafafa;
+  --color-metallic-platinum-300: #f5f5f5;
+  --color-metallic-platinum-400: #efefef;
+  --color-metallic-platinum-500: #e5e4e2;
+  --color-metallic-platinum-600: #d3d2d0;
+  --color-metallic-platinum-700: #bfbdba;
+  --color-metallic-platinum-800: #a8a6a3;
+  --color-metallic-platinum-900: #8f8d8a;
+  
+  --color-metallic-silver-50: #f9f9f9;
+  --color-metallic-silver-100: #f2f2f2;
+  --color-metallic-silver-200: #e6e6e6;
+  --color-metallic-silver-300: #d4d4d4;
+  --color-metallic-silver-400: #c0c0c0;
+  --color-metallic-silver-500: #a8a8a8;
+  --color-metallic-silver-600: #909090;
+  --color-metallic-silver-700: #787878;
+  --color-metallic-silver-800: #606060;
+  --color-metallic-silver-900: #4a4a4a;
+  
+  --color-metallic-gold-50: #fefbf3;
+  --color-metallic-gold-100: #fdf6e3;
+  --color-metallic-gold-200: #fbedcc;
+  --color-metallic-gold-300: #f7de9f;
+  --color-metallic-gold-400: #f2c866;
+  --color-metallic-gold-500: #d4af37;
+  --color-metallic-gold-600: #bf9a2a;
+  --color-metallic-gold-700: #a08224;
+  --color-metallic-gold-800: #826722;
+  --color-metallic-gold-900: #6b5520;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #f5f5f5;
   }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-playfair);
+  font-weight: 500;
+}
+
+/* Elegant scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-metallic-platinum-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-metallic-silver-400);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-metallic-silver-500);
+}
+
+/* Utility classes - Tailwind v4 compatible */
+.glass-metallic {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.glass-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(192, 192, 192, 0.1);
+}
+
+.btn-metallic-primary {
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, var(--color-metallic-silver-400), var(--color-metallic-silver-500));
+  color: var(--color-metallic-charcoal-900);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: scale(1);
+}
+
+.btn-metallic-primary:hover {
+  background: linear-gradient(to right, var(--color-metallic-silver-300), var(--color-metallic-silver-400));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.btn-metallic-gold {
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, var(--color-metallic-gold-400), var(--color-metallic-gold-500));
+  color: var(--color-metallic-charcoal-900);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: scale(1);
+}
+
+.btn-metallic-gold:hover {
+  background: linear-gradient(to right, var(--color-metallic-gold-300), var(--color-metallic-gold-400));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.btn-metallic-outline {
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  border: 2px solid var(--color-metallic-silver-400);
+  color: var(--color-metallic-silver-600);
+  background: transparent;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: scale(1);
+}
+
+.btn-metallic-outline:hover {
+  background: var(--color-metallic-silver-400);
+  color: white;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.text-metallic-gradient {
+  background: linear-gradient(to right, var(--color-metallic-silver-500), var(--color-metallic-platinum-400), var(--color-metallic-gold-400));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.product-card {
+  transition: all 0.5s ease-out;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(229, 228, 226, 0.5));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(192, 192, 192, 0.2);
+  transform: scale(1);
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+.product-card-image {
+  transition: all 0.7s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card:hover .product-card-image {
+  transform: scale(1.1);
+}
+
+.focus-metallic:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-metallic-silver-400);
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes metallic-shine {
+  from { transform: translateX(-100%) skewX(-15deg); }
+  to { transform: translateX(200%) skewX(-15deg); }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-metallic-shine {
+  animation: metallic-shine 2s ease-in-out infinite;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
