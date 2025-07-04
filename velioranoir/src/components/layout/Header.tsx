@@ -37,48 +37,38 @@ const Header = () => {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'glass-card backdrop-blur-metallic shadow-metallic' 
-          : 'bg-transparent'
+          ? 'bg-white/95 backdrop-blur-xl shadow-lg' 
+          : 'bg-white/90 backdrop-blur-sm'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-8 py-4">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-metallic-gold-400 to-metallic-gold-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-playfair font-bold text-lg">VN</span>
-            </div>
-            <div className="hidden sm:block">
-              <span className="text-xl font-medium text-gray-800">
-                Veliora Noir
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <span className="text-3xl font-playfair font-bold text-gray-900 tracking-wider transition-all duration-300 group-hover:text-gray-700">
+              Veliora Noir
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-black transition-colors duration-200 font-medium"
+                className="text-gray-800 hover:text-black transition-colors duration-200 font-medium"
               >
                 {item.name}
               </Link>
             ))}
           </div>
 
-          {/* Right side actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <button className="p-2 text-gray-600 hover:text-black transition-colors duration-200">
+            <button className="p-2 text-gray-700 hover:text-black transition-colors duration-200">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
 
-            {/* Wishlist */}
-            <button className="p-2 text-gray-600 hover:text-black transition-colors duration-200 relative">
+            <button className="p-2 text-gray-700 hover:text-black transition-colors duration-200 relative">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
@@ -87,10 +77,9 @@ const Header = () => {
               </span>
             </button>
 
-            {/* Cart */}
             <button 
               onClick={toggleCart}
-              className="p-2 text-gray-600 hover:text-black transition-colors duration-200 relative"
+              className="p-2 text-gray-700 hover:text-black transition-colors duration-200 relative min-h-[48px] min-w-[48px] flex items-center justify-center"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6" />
@@ -102,9 +91,8 @@ const Header = () => {
               )}
             </button>
 
-            {/* Mobile menu button */}
             <button
-              className="lg:hidden p-2 text-gray-600 hover:text-black transition-colors duration-200"
+              className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,15 +106,14 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4 pt-4">
+            <div className="flex flex-col space-y-2 pt-4">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-gray-700 hover:text-black transition-colors duration-200 font-medium py-2"
+                  className="text-gray-800 hover:text-black transition-colors duration-200 font-medium py-3 px-2 rounded-lg hover:bg-gray-100 min-h-[48px] flex items-center"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}

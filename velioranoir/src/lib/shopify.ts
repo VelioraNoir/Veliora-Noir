@@ -1,4 +1,4 @@
-// src/lib/shopify.ts
+// src/lib/shopify.ts - UPDATE THIS EXISTING FILE
 import Client from 'shopify-buy';
 
 // Improved interfaces with better type safety
@@ -55,6 +55,12 @@ export interface Product {
   tags: string[];
 }
 
+// Checkout Line Item interface
+export interface CheckoutLineItem {
+  variantId: string;
+  quantity: number;
+}
+
 // Validate environment variables
 const validateEnv = () => {
   const domain = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
@@ -80,7 +86,6 @@ const initializeClient = () => {
     });
   } catch (error) {
     console.error('Failed to initialize Shopify client:', error);
-    // Return null client for graceful degradation
     return null;
   }
 };
@@ -164,6 +169,56 @@ export async function getProduct(id: string): Promise<Product | null> {
   } catch (error) {
     console.error('Error fetching product:', error);
     throw new ShopifyError(`Failed to fetch product ${id}`, error as Error);
+  }
+}
+
+// CREATE SHOPIFY CHECKOUT - Simplified approach
+export async function createCheckout(lineItems: CheckoutLineItem[]) {
+  if (!client) {
+    throw new ShopifyError('Shopify client not initialized. Check your environment variables.');
+  }
+
+  try {
+    console.log('🛒 Creating Shopify checkout with items:', lineItems);
+    
+    // Try the standard checkout method first
+    const checkout = await client.checkout.create();
+    console.log('✅ Empty checkout created:', checkout.id);
+    
+    // Add line items to checkout
+    const checkoutWithItems = await client.checkout.addLineItems(checkout.id, lineItems);
+    console.log('✅ Items added to checkout. URL:', checkoutWithItems.webUrl);
+    
+    return {
+      id: checkoutWithItems.id,
+      webUrl: checkoutWithItems.webUrl,
+      subtotalPrice: checkoutWithItems.subtotalPrice,
+      totalPrice: checkoutWithItems.totalPrice,
+      lineItems: checkoutWithItems.lineItems,
+    };
+  } catch (error) {
+    console.error('❌ Checkout creation failed:', error);
+    console.log('🔄 Trying alternative checkout method...');
+    
+    // Alternative: Create a direct cart URL (works for all Shopify versions)
+    try {
+      const domain = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
+      const cartItems = lineItems.map(item => `${item.variantId}:${item.quantity}`).join(',');
+      const cartUrl = `https://${domain}/cart/${cartItems}`;
+      
+      console.log('✅ Created direct cart URL:', cartUrl);
+      
+      return {
+        id: 'direct-cart',
+        webUrl: cartUrl,
+        subtotalPrice: { amount: '0', currencyCode: 'USD' },
+        totalPrice: { amount: '0', currencyCode: 'USD' },
+        lineItems: [],
+      };
+    } catch (urlError) {
+      console.error('❌ Direct cart URL creation failed:', urlError);
+      throw new ShopifyError('Unable to create checkout. Please try adding items to cart manually on our store.', error as Error);
+    }
   }
 }
 

@@ -1,7 +1,8 @@
-// src/app/page.tsx
+// src/app/page.tsx - UPDATE THIS EXISTING FILE
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Suspense, useState, useEffect } from 'react';
 import { getAllProductsWithFallback, Product } from '../lib/shopify';
 import { ProductCardSkeleton, ErrorMessage } from '../components/ui/LoadingComponents';
@@ -9,7 +10,7 @@ import Advanced3DViewer from '../components/3d/Advanced3DScene';
 import CartDrawer from '../components/cart/CartDrawer';
 import { useCartStore } from '../store/cartStore';
 
-// Enhanced Product Card with Cart Integration
+// Enhanced Product Card with Cart Integration and Links - FIXED BUTTON ALIGNMENT
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [selectedMaterial, setSelectedMaterial] = useState('Silver');
   const [isMounted, setIsMounted] = useState(false);
@@ -23,59 +24,51 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
     setIsMounted(true);
   }, []);
 
-  const handleAddToCart = (material?: string) => {
+  const handleAddToCart = (e: React.MouseEvent, material?: string) => {
+    e.preventDefault(); // Prevent navigation when clicking add to cart
+    e.stopPropagation();
+    
     if (mainVariant && isMounted) {
-      console.log('Adding to cart:', product.title, mainVariant.available); // Debug log
+      console.log('Adding to cart:', product.title, mainVariant.available);
       addItem(product, mainVariant.id, material || selectedMaterial);
       
-      // Show feedback
+      // Show luxury feedback
       setShowAddedFeedback(true);
-      setTimeout(() => setShowAddedFeedback(false), 2000);
+      setTimeout(() => setShowAddedFeedback(false), 3000);
     }
   };
 
   return (
-    <div 
-      className="product-card rounded-2xl overflow-hidden animate-fade-in-up"
+    <Link 
+      href={`/products/${encodeURIComponent(product.id)}`}
+      className="block product-card rounded-2xl overflow-hidden animate-fade-in-up group h-full flex flex-col"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className="product-card-image aspect-square relative group">
+      <div className="product-card-image aspect-square relative">
         <Image
           src={mainImage?.src || '/placeholder-product.jpg'}
           alt={mainImage?.altText || product.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           priority={index < 4}
         />
         
-        {/* Simple overlay on hover */}
+        {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
         
-        {/* Single Add to Cart button */}
+        {/* Quick Add to Cart button */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
-            onClick={() => handleAddToCart()}
+            onClick={(e) => handleAddToCart(e)}
             className={`btn-primary text-sm ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!mainVariant?.available}
           >
-            {mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
+            {mainVariant?.available ? 'Quick Add' : 'Sold Out'}
           </button>
         </div>
 
-        {/* Added to Cart Feedback */}
-        {showAddedFeedback && (
-          <div className="absolute inset-0 bg-green-500/90 flex items-center justify-center animate-fade-in">
-            <div className="text-white text-center">
-              <svg className="w-8 h-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <p className="text-sm font-medium">Added to Cart!</p>
-            </div>
-          </div>
-        )}
-
-        {/* Availability badge only - show if sold out */}
+        {/* Availability badge */}
         {!mainVariant?.available && (
           <div className="absolute top-4 left-4 bg-red-600/80 text-white px-3 py-1 rounded-full text-sm">
             Sold Out
@@ -83,68 +76,96 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         )}
       </div>
       
-      <div className="p-6">
-        <h3 className="text-lg font-medium text-black mb-2 line-clamp-2">
-          {product.title}
-        </h3>
-        
-        {/* Product type and vendor */}
-        {product.productType && (
-          <p className="text-sm text-gray-500 mb-3">
-            {product.productType} {product.vendor && `• ${product.vendor}`}
-          </p>
-        )}
+      {/* FIXED: Flex layout to push button to bottom */}
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex-1">
+          <h3 className="text-lg font-medium text-black mb-2 line-clamp-2">
+            {product.title}
+          </h3>
+          
+          {/* Product type and vendor */}
+          {product.productType && (
+            <p className="text-sm text-gray-500 mb-3">
+              {product.productType} {product.vendor && `• ${product.vendor}`}
+            </p>
+          )}
 
-        {/* Material Selector */}
-        <div className="mb-4">
-          <p className="text-xs text-gray-500 mb-2">Material:</p>
-          <div className="flex gap-2">
-            {['Silver', 'Gold', 'Platinum'].map((material) => (
-              <button
-                key={material}
-                onClick={() => setSelectedMaterial(material)}
-                className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${
-                  selectedMaterial === material 
-                    ? 'border-black scale-110' 
-                    : 'border-gray-300'
-                }`}
-                style={{
-                  backgroundColor: material === 'Gold' ? '#d4af37' : 
-                                 material === 'Platinum' ? '#E5E4E2' : '#C0C0C0'
-                }}
-                title={material}
-              />
-            ))}
+          {/* Material Selector */}
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-2">Material:</p>
+            <div className="flex gap-2">
+              {['Silver', 'Gold', 'Platinum'].map((material) => (
+                <button
+                  key={material}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedMaterial(material);
+                  }}
+                  className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${
+                    selectedMaterial === material 
+                      ? 'border-black scale-110' 
+                      : 'border-gray-300'
+                  }`}
+                  style={{
+                    backgroundColor: material === 'Gold' ? '#d4af37' : 
+                                   material === 'Platinum' ? '#E5E4E2' : '#C0C0C0'
+                  }}
+                  title={material}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-2xl font-semibold text-black">
+              ${mainVariant?.price}
+            </p>
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <svg 
+                  key={i} 
+                  className="w-4 h-4 text-gray-300" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
           </div>
         </div>
         
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-2xl font-semibold text-black">
-            ${mainVariant?.price}
-          </p>
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <svg 
-                key={i} 
-                className="w-4 h-4 text-gray-300" 
-                fill="currentColor" 
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-        </div>
-        
+        {/* FIXED: Button always at bottom */}
         <button 
-          onClick={() => handleAddToCart(selectedMaterial)}
-          className={`w-full mt-4 btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''} ${showAddedFeedback ? 'bg-green-500 text-white' : ''}`}
+          onClick={(e) => handleAddToCart(e, selectedMaterial)}
+          className={`w-full btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={!mainVariant?.available}
         >
-          {showAddedFeedback ? '✓ Added to Cart!' : mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
+          {mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
         </button>
       </div>
-    </div>
+
+      {/* Luxury Added to Cart Popup */}
+      {showAddedFeedback && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20 animate-fade-in-up max-w-sm mx-4">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-playfair font-semibold text-gray-900 mb-2">
+                Added to Cart
+              </h3>
+              <p className="text-sm text-gray-600 mb-1">{product.title}</p>
+              <p className="text-xs text-gray-500">{selectedMaterial} • ${mainVariant?.price}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </Link>
   );
 };
 
@@ -164,12 +185,12 @@ const HeroSection = () => {
               where timeless elegance meets contemporary sophistication.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center animate-fade-in-up delay-300">
-              <button className="btn-primary">
+              <Link href="/collections" className="btn-primary">
                 Explore Collection
-              </button>
-              <button className="btn-secondary">
+              </Link>
+              <Link href="/about" className="btn-secondary">
                 Our Story
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -269,9 +290,9 @@ export default function Home() {
 
             {/* Load More Button */}
             <div className="text-center mt-16">
-              <button className="btn-secondary">
+              <Link href="/collections" className="btn-secondary">
                 View All Accessories
-              </button>
+              </Link>
             </div>
           </div>
         </section>

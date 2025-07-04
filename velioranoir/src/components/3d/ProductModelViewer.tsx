@@ -1,33 +1,36 @@
-// src/components/3d/Advanced3DScene.tsx - Luxury Enhancements
+// src/components/3d/ProductModelViewer.tsx - Load Real 3D Models
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-interface Advanced3DViewerProps {
+// You'll need to install this: npm install three@latest
+// Add to your project: import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+interface ProductModelViewerProps {
   className?: string;
-  enablePostProcessing?: boolean;
-  initialProductType?: string;
+  modelPath?: string; // Path to your GLB/GLTF file
   initialMaterial?: string;
 }
 
-export default function Advanced3DViewer({ 
+export default function ProductModelViewer({ 
   className = '', 
-  enablePostProcessing = true,
-  initialProductType = 'Ring',
+  modelPath = '/models/ring.glb', // Put your 3D model files in public/models/
   initialMaterial = 'Silver'
-}: Advanced3DViewerProps) {
+}: ProductModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const ringRef = useRef<THREE.Mesh | null>(null);
+  const modelRef = useRef<THREE.Object3D | null>(null);
   const particlesRef = useRef<THREE.Points | null>(null);
   const animationIdRef = useRef<number | null>(null);
   
   const [material, setMaterial] = useState('Silver');
   const [isInteracting, setIsInteracting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showParticles, setShowParticles] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const touchRef = useRef({ x: 0, y: 0 });
 
@@ -45,14 +48,14 @@ export default function Advanced3DViewer({
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Scene setup with luxury environment
+    // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf8f9fa);
     sceneRef.current = scene;
 
     // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 5);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 8);
     cameraRef.current = camera;
 
     // Renderer setup
@@ -66,92 +69,138 @@ export default function Advanced3DViewer({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     rendererRef.current = renderer;
 
     container.appendChild(renderer.domElement);
 
-    // Enhanced lighting for luxury feel
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    // Enhanced lighting setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    // Key light (main)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
     keyLight.position.set(5, 5, 5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
     keyLight.shadow.mapSize.height = 2048;
     scene.add(keyLight);
 
-    // Fill light (softer)
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
     fillLight.position.set(-3, 2, 4);
     scene.add(fillLight);
 
-    // Rim light for edge definition
-    const rimLight = new THREE.DirectionalLight(0xffd700, 0.6);
+    const rimLight = new THREE.DirectionalLight(0xffd700, 0.8);
     rimLight.position.set(0, 0, -5);
     scene.add(rimLight);
 
-    // Environment map for reflections (creates luxury studio look)
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const envGeometry = new THREE.SphereGeometry(50, 32, 16);
-    const envMaterial = new THREE.MeshBasicMaterial({
-      color: 0xf0f0f0,
-      side: THREE.BackSide
-    });
-    const envSphere = new THREE.Mesh(envGeometry, envMaterial);
-    scene.add(envSphere);
+    // Load 3D Model
+    const loadModel = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-    // Ring geometry
-    const ringGeometry = new THREE.TorusGeometry(1, 0.3, 16, 100);
-    
-    // Initial material with enhanced properties
-    const currentMat = materials.find(m => m.name === material) || materials[0];
-    const ringMaterial = new THREE.MeshStandardMaterial({
-      color: currentMat.color,
-      metalness: currentMat.metalness,
-      roughness: currentMat.roughness,
-      envMapIntensity: 1.5, // Enhanced reflections
-    });
+        // Dynamic import to avoid SSR issues
+        const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+        const loader = new GLTFLoader();
 
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.castShadow = true;
-    ring.receiveShadow = true;
-    scene.add(ring);
-    ringRef.current = ring;
+        loader.load(
+          modelPath,
+          (gltf) => {
+            const model = gltf.scene;
+            
+            // Center and scale the model
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            
+            // Scale to fit nicely in view
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2 / maxDim;
+            model.scale.setScalar(scale);
+            
+            // Center the model
+            model.position.x = -center.x * scale;
+            model.position.y = -center.y * scale;
+            model.position.z = -center.z * scale;
 
-    // Enhanced gems with inner glow
-    const gemGeometry = new THREE.SphereGeometry(0.08, 16, 16);
-    const gemMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff6b9d,
-      transparent: true,
-      opacity: 0.9,
-      metalness: 0,
-      roughness: 0,
-      emissive: 0xff6b9d,
-      emissiveIntensity: 0.1,
-    });
+            // Apply initial material to all meshes
+            model.traverse((child) => {
+              if (child instanceof THREE.Mesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                
+                // Apply jewelry material
+                const currentMat = materials.find(m => m.name === material) || materials[0];
+                child.material = new THREE.MeshStandardMaterial({
+                  color: currentMat.color,
+                  metalness: currentMat.metalness,
+                  roughness: currentMat.roughness,
+                  envMapIntensity: 1.5,
+                });
+              }
+            });
 
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const gem = new THREE.Mesh(gemGeometry, gemMaterial);
-      gem.position.set(Math.cos(angle) * 1.0, Math.sin(angle) * 1.0, 0);
-      ring.add(gem);
-    }
+            scene.add(model);
+            modelRef.current = model;
+            setIsLoading(false);
+          },
+          (progress) => {
+            console.log('Loading progress:', (progress.loaded / progress.total) * 100 + '%');
+          },
+          (error) => {
+            console.error('Error loading model:', error);
+            setError('Failed to load 3D model. Using fallback...');
+            
+            // Fallback to simple ring if model fails to load
+            createFallbackRing();
+            setIsLoading(false);
+          }
+        );
+      } catch (err) {
+        console.error('Error importing GLTFLoader:', err);
+        setError('3D model loader unavailable. Using fallback...');
+        createFallbackRing();
+        setIsLoading(false);
+      }
+    };
 
-    // Subtle floating particles (luxury dust)
-    const particleCount = 15; // Keep it minimal for performance
+    // Fallback ring creation
+    const createFallbackRing = () => {
+      const ringGeometry = new THREE.TorusGeometry(1, 0.3, 16, 100);
+      const currentMat = materials.find(m => m.name === material) || materials[0];
+      const ringMaterial = new THREE.MeshStandardMaterial({
+        color: currentMat.color,
+        metalness: currentMat.metalness,
+        roughness: currentMat.roughness,
+        envMapIntensity: 1.5,
+      });
+
+      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      ring.castShadow = true;
+      ring.receiveShadow = true;
+      
+      // Wrap mesh in a group for consistent API
+      const group = new THREE.Group();
+      group.add(ring);
+      scene.add(group);
+      modelRef.current = group;
+    };
+
+    loadModel();
+
+    // Enhanced floating particles
+    const particleCount = 25;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 8;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 8;
+      positions[i * 3] = (Math.random() - 0.5) * 6;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 6;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
       
-      velocities[i * 3] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
     }
 
     const particleGeometry = new THREE.BufferGeometry();
@@ -159,28 +208,18 @@ export default function Advanced3DViewer({
 
     const particleMaterial = new THREE.PointsMaterial({
       color: 0xffd700,
-      size: 0.02,
+      size: 0.1,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
     });
 
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
     particlesRef.current = particles;
 
-    // Gentle ring glow effect
-    const glowGeometry = new THREE.TorusGeometry(1.1, 0.35, 16, 100);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: currentMat.color,
-      transparent: true,
-      opacity: 0.1,
-      side: THREE.BackSide,
-    });
-    const ringGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-    ring.add(ringGlow);
-
-    // Touch and mouse controls
+    // Controls
     const handleTouchStart = (event: TouchEvent) => {
       setIsInteracting(true);
       const touch = event.touches[0];
@@ -188,14 +227,14 @@ export default function Advanced3DViewer({
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (!isInteracting || !ring) return;
+      if (!isInteracting || !modelRef.current) return;
       
       const touch = event.touches[0];
       const deltaX = touch.clientX - touchRef.current.x;
       const deltaY = touch.clientY - touchRef.current.y;
       
-      ring.rotation.y += deltaX * 0.01;
-      ring.rotation.x += deltaY * 0.01;
+      modelRef.current.rotation.y += deltaX * 0.01;
+      modelRef.current.rotation.x += deltaY * 0.01;
       
       touchRef.current = { x: touch.clientX, y: touch.clientY };
     };
@@ -210,13 +249,13 @@ export default function Advanced3DViewer({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isInteracting || !ring) return;
+      if (!isInteracting || !modelRef.current) return;
       
       const deltaX = event.clientX - mouseRef.current.x;
       const deltaY = event.clientY - mouseRef.current.y;
       
-      ring.rotation.y += deltaX * 0.01;
-      ring.rotation.x += deltaY * 0.01;
+      modelRef.current.rotation.y += deltaX * 0.01;
+      modelRef.current.rotation.x += deltaY * 0.01;
       
       mouseRef.current = { x: event.clientX, y: event.clientY };
     };
@@ -232,16 +271,16 @@ export default function Advanced3DViewer({
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
 
-    // Enhanced animation loop
+    // Animation loop
     let time = 0;
     const animate = () => {
       time += 0.01;
       
-      if (!ring) return;
+      if (!modelRef.current) return;
       
       // Auto rotation when not interacting
       if (!isInteracting) {
-        ring.rotation.y += 0.005;
+        modelRef.current.rotation.y += 0.005;
       }
 
       // Animate particles
@@ -252,26 +291,12 @@ export default function Advanced3DViewer({
           positions[i * 3 + 1] += velocities[i * 3 + 1];
           positions[i * 3 + 2] += velocities[i * 3 + 2];
           
-          // Boundary check (keep particles in view)
-          if (Math.abs(positions[i * 3]) > 4) velocities[i * 3] *= -1;
-          if (Math.abs(positions[i * 3 + 1]) > 4) velocities[i * 3 + 1] *= -1;
-          if (Math.abs(positions[i * 3 + 2]) > 4) velocities[i * 3 + 2] *= -1;
+          if (Math.abs(positions[i * 3]) > 3) velocities[i * 3] *= -1;
+          if (Math.abs(positions[i * 3 + 1]) > 3) velocities[i * 3 + 1] *= -1;
+          if (Math.abs(positions[i * 3 + 2]) > 3) velocities[i * 3 + 2] *= -1;
         }
         particles.geometry.attributes.position.needsUpdate = true;
-        
-        // Gentle rotation
         particles.rotation.y += 0.001;
-      }
-
-      // Subtle glow pulsing
-      const glow = ring.children.find(child => 
-        child instanceof THREE.Mesh && 
-        child.material && 
-        (child.material as THREE.Material).transparent
-      ) as THREE.Mesh | undefined;
-      
-      if (glow && glow.material) {
-        (glow.material as THREE.MeshBasicMaterial).opacity = 0.05 + Math.sin(time) * 0.03;
       }
       
       renderer.render(scene, camera);
@@ -310,31 +335,31 @@ export default function Advanced3DViewer({
       }
       
       renderer.dispose();
-      pmremGenerator.dispose();
     };
-  }, [showParticles]);
+  }, [showParticles, modelPath]);
 
   // Update material when changed
   useEffect(() => {
-    if (!ringRef.current) return;
+    if (!modelRef.current) return;
     
     const currentMat = materials.find(m => m.name === material) || materials[0];
-    const mesh = ringRef.current as THREE.Mesh;
-    const meshMaterial = mesh.material as THREE.MeshStandardMaterial;
     
-    meshMaterial.color.setHex(currentMat.color);
-    meshMaterial.metalness = currentMat.metalness;
-    meshMaterial.roughness = currentMat.roughness;
-
-    // Update glow color
-    const glow = mesh.children.find(child => 
-      child instanceof THREE.Mesh && 
-      child.material && 
-      (child.material as THREE.Material).transparent
-    ) as THREE.Mesh | undefined;
-    
-    if (glow && glow.material) {
-      (glow.material as THREE.MeshBasicMaterial).color.setHex(currentMat.color);
+    // Safe traverse - check if object has traverse method
+    if ('traverse' in modelRef.current && typeof modelRef.current.traverse === 'function') {
+      modelRef.current.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.material) {
+          const meshMaterial = child.material as THREE.MeshStandardMaterial;
+          meshMaterial.color.setHex(currentMat.color);
+          meshMaterial.metalness = currentMat.metalness;
+          meshMaterial.roughness = currentMat.roughness;
+        }
+      });
+    } else if (modelRef.current instanceof THREE.Mesh && modelRef.current.material) {
+      // Handle single mesh case
+      const meshMaterial = modelRef.current.material as THREE.MeshStandardMaterial;
+      meshMaterial.color.setHex(currentMat.color);
+      meshMaterial.metalness = currentMat.metalness;
+      meshMaterial.roughness = currentMat.roughness;
     }
   }, [material]);
 
@@ -347,7 +372,24 @@ export default function Advanced3DViewer({
         style={{ touchAction: 'none' }}
       />
 
-      {/* Enhanced Material Controls */}
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm">
+          <div className="text-center">
+            <div className="luxury-spinner mx-auto mb-4"></div>
+            <p className="text-sm text-gray-600">Loading 3D model...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+          <p className="text-xs text-yellow-800">{error}</p>
+        </div>
+      )}
+
+      {/* Material Controls */}
       <div className="absolute bottom-4 left-4 right-4">
         <div className="bg-white/95 backdrop-blur-md rounded-xl p-4 shadow-xl border border-white/20">
           <div className="flex flex-col gap-4">
@@ -365,7 +407,7 @@ export default function Advanced3DViewer({
                 <button
                   key={mat.name}
                   onClick={() => setMaterial(mat.name)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                  className={`material-button px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                     material === mat.name
                       ? 'bg-gray-900 text-white shadow-lg scale-105 ring-2 ring-gray-300'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-102'
@@ -391,11 +433,11 @@ export default function Advanced3DViewer({
         </p>
       </div>
 
-      {/* Luxury Brand Badge */}
+      {/* Product Badge */}
       <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md rounded-lg p-3 shadow-lg">
         <div className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full animate-pulse"></div>
-          <span className="text-gray-700 font-medium">Real-time 3D</span>
+          <span className="text-gray-700 font-medium">3D Product View</span>
         </div>
       </div>
     </div>

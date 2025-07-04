@@ -16,6 +16,7 @@ export default {
         'hero': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
         'display': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
         'heading': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'brand': ['3rem', { lineHeight: '1.1', letterSpacing: '0.05em' }],
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out forwards',
