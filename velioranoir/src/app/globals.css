@@ -8,9 +8,10 @@
   --accent-secondary: #86868b;
   --accent-gold: #d4af37;
   
-  /* Apple-inspired font stack */
+  /* Enhanced font stack for luxury branding */
   --font-primary: 'SF Pro Display', 'Inter', system-ui, sans-serif;
   --font-secondary: 'Inter', system-ui, sans-serif;
+  --font-luxury: 'Playfair Display SC', serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +43,19 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.022em;
 }
 
+/* Luxury brand font for special text */
+.font-playfair {
+  font-family: var(--font-luxury);
+}
+
+/* Brand-specific luxury styling */
+.brand-name {
+  font-family: var(--font-luxury);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
 /* Minimal scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
@@ -60,77 +74,117 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* Apple-inspired glass card */
+/* Enhanced glass card with luxury feel */
 .glass-card {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 18px;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Refined button styles */
+/* Refined button styles with luxury touches */
 .btn-primary {
-  padding: 12px 32px;
-  border-radius: 980px;
+  padding: 14px 36px;
+  border-radius: 50px;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.47;
   letter-spacing: -0.022em;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  background: var(--accent-primary);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
   color: white;
   border: none;
   cursor: pointer;
-  min-height: 44px; /* Better mobile touch target */
+  min-height: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
 }
 
 .btn-primary:hover {
-  background: #424245;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #1a1a1a 0%, #404040 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
-  padding: 12px 32px;
-  border-radius: 980px;
+  padding: 14px 36px;
+  border-radius: 50px;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.47;
   letter-spacing: -0.022em;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  background: transparent;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.8);
   color: var(--accent-primary);
   border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  min-height: 44px; /* Better mobile touch target */
+  min-height: 48px;
+  backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.95);
   border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .btn-gold {
-  padding: 12px 32px;
-  border-radius: 980px;
+  padding: 14px 36px;
+  border-radius: 50px;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.47;
   letter-spacing: -0.022em;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   background: linear-gradient(135deg, #d4af37 0%, #f2c866 100%);
   color: white;
   border: none;
   cursor: pointer;
-  min-height: 44px; /* Better mobile touch target */
+  min-height: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.btn-gold:hover::before {
+  left: 100%;
 }
 
 .btn-gold:hover {
   background: linear-gradient(135deg, #bf9a2a 0%, #d4af37 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.4);
 }
 
 /* Mobile-specific improvements */
@@ -140,49 +194,99 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .btn-primary, .btn-secondary, .btn-gold {
-    font-size: 18px;
-    padding: 14px 24px;
-    min-height: 48px; /* Larger touch targets on mobile */
+    font-size: 16px;
+    padding: 16px 28px;
+    min-height: 52px;
   }
   
-  /* Ensure text is readable on mobile */
   body {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
   
-  /* Better mobile cart button visibility */
   .product-card:hover .absolute {
-    opacity: 1; /* Always show on mobile since no hover */
+    opacity: 1;
   }
 }
 
-/* Refined product card */
+/* Enhanced product card with luxury holographic effect */
 .product-card {
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
   overflow: hidden;
+  position: relative;
+}
+
+/* Holographic shimmer effect */
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    rgba(212, 175, 55, 0.1),
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.8s ease-in-out;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.product-card:hover::before {
+  left: 100%;
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border-color: rgba(0, 0, 0, 0.08);
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(212, 175, 55, 0.3);
 }
 
 .product-card-image {
   position: relative;
   overflow: hidden;
-  border-radius: 18px 18px 0 0;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Luxury image overlay */
+.product-card-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(212, 175, 55, 0) 0%,
+    rgba(212, 175, 55, 0.05) 50%,
+    rgba(192, 192, 192, 0.05) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.product-card:hover .product-card-image::after {
+  opacity: 1;
 }
 
 /* Apple-inspired animations */
 @keyframes fadeInUp {
   0% { 
     opacity: 0; 
-    transform: translateY(20px); 
+    transform: translateY(30px); 
   }
   100% { 
     opacity: 1; 
@@ -195,12 +299,91 @@ h1, h2, h3, h4, h5, h6 {
   100% { opacity: 1; }
 }
 
+@keyframes luxuryPulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% { 
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+  }
+}
+
+@keyframes metallicShine {
+  0% { 
+    transform: translateX(-100%) skewX(-15deg); 
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-luxury-pulse {
+  animation: luxuryPulse 2s ease-in-out infinite;
+}
+
+/* Luxury cursor effects */
+.cursor-luxury {
+  cursor: none;
+}
+
+.cursor-luxury * {
+  cursor: none;
+}
+
+/* Custom luxury cursor (optional enhancement) */
+.luxury-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(212, 175, 55, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: rgba(212, 175, 55, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.luxury-cursor.hover {
+  transform: scale(1.5);
+  border-color: rgba(212, 175, 55, 1);
+  background: rgba(212, 175, 55, 0.2);
+}
+
+/* Enhanced material selector buttons */
+.material-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.material-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.4s;
+}
+
+.material-button:hover::before {
+  left: 100%;
 }
 
 /* Delay utilities */
@@ -208,3 +391,39 @@ h1, h2, h3, h4, h5, h6 {
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Performance optimization */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Luxury loading animation */
+@keyframes luxurySpinner {
+  0% { 
+    transform: rotate(0deg);
+    border-color: rgba(212, 175, 55, 1) transparent transparent transparent;
+  }
+  25% {
+    border-color: rgba(192, 192, 192, 1) rgba(212, 175, 55, 1) transparent transparent;
+  }
+  50% {
+    border-color: transparent rgba(192, 192, 192, 1) rgba(212, 175, 55, 1) transparent;
+  }
+  75% {
+    border-color: transparent transparent rgba(192, 192, 192, 1) rgba(212, 175, 55, 1);
+  }
+  100% { 
+    transform: rotate(360deg);
+    border-color: rgba(212, 175, 55, 1) transparent transparent transparent;
+  }
+}
+
+.luxury-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  animation: luxurySpinner 1.2s linear infinite;
+}

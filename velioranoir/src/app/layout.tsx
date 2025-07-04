@@ -1,6 +1,6 @@
-// src/app/layout.tsx
+// src/app/layout.tsx - Updated with Playfair Display SC
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Playfair_Display_SC } from 'next/font/google';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import "./globals.css";
@@ -12,8 +12,9 @@ const inter = Inter({
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
+const playfairSC = Playfair_Display_SC({
   subsets: ['latin'],
+  weight: ['400', '700', '900'],
   variable: '--font-playfair',
   display: 'swap',
 });
@@ -48,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} ${playfairSC.variable} scroll-smooth`}>
       <head>
         {/* Preload critical resources */}
         <link rel="preload" href="/hdri/studio_small_03_1k.hdr" as="fetch" crossOrigin="anonymous" />

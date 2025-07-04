@@ -1,11 +1,14 @@
-// src/components/cart/CartDrawer.tsx
+// src/components/cart/CartDrawer.tsx - UPDATE THIS EXISTING FILE
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useCartStore } from '../../store/cartStore';
+import { createCheckout } from '../../lib/shopify';
 
 const CartDrawer = () => {
   const [isMounted, setIsMounted] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { 
     items, 
     isOpen, 
@@ -20,6 +23,36 @@ const CartDrawer = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
+
+    setIsCheckingOut(true);
+    setCheckoutError(null);
+
+    try {
+      // Convert cart items to Shopify checkout format
+      const lineItems = items.map(item => ({
+        variantId: item.variantId,
+        quantity: item.quantity,
+      }));
+
+      console.log('🛒 Starting checkout with items:', lineItems);
+
+      // Create checkout with Shopify
+      const checkout = await createCheckout(lineItems);
+      
+      console.log('✅ Checkout created, redirecting to:', checkout.webUrl);
+
+      // Redirect to Shopify checkout
+      window.location.href = checkout.webUrl;
+      
+    } catch (error) {
+      console.error('❌ Checkout failed:', error);
+      setCheckoutError(error instanceof Error ? error.message : 'Checkout failed. Please try again.');
+      setIsCheckingOut(false);
+    }
+  };
 
   // Don't render anything until mounted on client
   if (!isMounted) {
@@ -89,7 +122,17 @@ const CartDrawer = () => {
                 return (
                   <div key={item.id} className="glass-card p-4 rounded-xl">
                     <div className="flex gap-4">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0"></div>
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        {mainImage ? (
+                          <img 
+                            src={mainImage.src} 
+                            alt={item.product.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200" />
+                        )}
+                      </div>
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900">{item.product.title}</h3>
                         <p className="text-sm text-gray-500">{item.selectedMaterial}</p>
@@ -98,14 +141,14 @@ const CartDrawer = () => {
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center"
+                              className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
                             >
                               -
                             </button>
                             <span>{item.quantity}</span>
                             <button 
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center"
+                              className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
                             >
                               +
                             </button>
@@ -113,7 +156,7 @@ const CartDrawer = () => {
                         </div>
                         <button 
                           onClick={() => removeItem(item.id)}
-                          className="text-red-500 text-sm mt-2"
+                          className="text-red-500 text-sm mt-2 hover:text-red-700"
                         >
                           Remove
                         </button>
@@ -129,16 +172,42 @@ const CartDrawer = () => {
         {/* Footer */}
         {items.length > 0 && (
           <div className="border-t p-6">
+            {/* Error Message */}
+            {checkoutError && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
+                <p className="text-red-700 text-sm">{checkoutError}</p>
+              </div>
+            )}
+
             <div className="flex justify-between text-lg font-semibold mb-4">
               <span>Total:</span>
               <span>{formatPrice(getTotalPrice())}</span>
             </div>
-            <button className="w-full bg-gray-900 text-white py-3 rounded-full mb-2">
-              Checkout
+            
+            {/* Main Checkout Button */}
+            <button 
+              onClick={handleCheckout}
+              disabled={isCheckingOut}
+              className={`w-full py-3 rounded-full mb-2 font-medium transition-all duration-200 ${
+                isCheckingOut 
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+              }`}
+            >
+              {isCheckingOut ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Processing...
+                </div>
+              ) : (
+                'Secure Checkout'
+              )}
             </button>
+            
             <button 
               onClick={clearCart}
-              className="w-full border border-gray-300 py-3 rounded-full"
+              className="w-full border border-gray-300 py-3 rounded-full hover:bg-gray-50"
+              disabled={isCheckingOut}
             >
               Clear Cart
             </button>
