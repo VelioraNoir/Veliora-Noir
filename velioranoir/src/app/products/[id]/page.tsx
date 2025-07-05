@@ -73,7 +73,7 @@ export default function ProductPage() {
     const variant = product.variants.find(v => v.id === selectedVariant);
     if (!variant?.available) return;
 
-    addItem(product, selectedVariant, selectedMaterial);
+    addItem(product, selectedVariant);
     
     // Show luxury feedback
     setShowAddedFeedback(true);
