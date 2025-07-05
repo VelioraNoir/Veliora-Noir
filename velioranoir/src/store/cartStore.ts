@@ -1,4 +1,4 @@
-// src/store/cartStore.ts
+// src/store/cartStore.ts - REPLACE ENTIRE FILE
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '../lib/shopify';
@@ -8,14 +8,13 @@ interface CartItem {
   product: Product;
   variantId: string;
   quantity: number;
-  selectedMaterial?: string;
   addedAt: Date;
 }
 
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, variantId: string, material?: string) => void;
+  addItem: (product: Product, variantId: string) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -30,9 +29,9 @@ export const useCartStore = create<CartStore>()(
       items: [],
       isOpen: false,
       
-      addItem: (product, variantId, material) => {
+      addItem: (product, variantId) => {
         const existingItemIndex = get().items.findIndex(
-          item => item.product.id === product.id && item.variantId === variantId && item.selectedMaterial === material
+          item => item.product.id === product.id && item.variantId === variantId
         );
 
         if (existingItemIndex > -1) {
@@ -45,11 +44,10 @@ export const useCartStore = create<CartStore>()(
           }));
         } else {
           const newItem: CartItem = {
-            id: `${product.id}-${variantId}-${material || 'default'}-${Date.now()}`,
+            id: `${product.id}-${variantId}-${Date.now()}`,
             product,
             variantId,
             quantity: 1,
-            selectedMaterial: material,
             addedAt: new Date(),
           };
           

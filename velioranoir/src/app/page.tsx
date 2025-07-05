@@ -1,4 +1,4 @@
-// src/app/page.tsx - UPDATE THIS EXISTING FILE
+// src/app/page.tsx - REPLACE ENTIRE FILE
 'use client';
 
 import Image from 'next/image';
@@ -9,10 +9,13 @@ import { ProductCardSkeleton, ErrorMessage } from '../components/ui/LoadingCompo
 import Advanced3DViewer from '../components/3d/Advanced3DScene';
 import CartDrawer from '../components/cart/CartDrawer';
 import { useCartStore } from '../store/cartStore';
+import PresaleBanner from '../components/ui/PresaleBanner';
+import SearchModal from '../components/ui/SearchModal';
+import NewsletterSignup from '../components/ui/NewsletterSignup';
+import Footer from '../components/layout/Footer';
 
 // Enhanced Product Card with Cart Integration and Links - FIXED BUTTON ALIGNMENT
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
-  const [selectedMaterial, setSelectedMaterial] = useState('Silver');
   const [isMounted, setIsMounted] = useState(false);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const { addItem } = useCartStore();
@@ -24,13 +27,13 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
     setIsMounted(true);
   }, []);
 
-  const handleAddToCart = (e: React.MouseEvent, material?: string) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking add to cart
     e.stopPropagation();
     
     if (mainVariant && isMounted) {
       console.log('Adding to cart:', product.title, mainVariant.available);
-      addItem(product, mainVariant.id, material || selectedMaterial);
+      addItem(product, mainVariant.id);
       
       // Show luxury feedback
       setShowAddedFeedback(true);
@@ -60,7 +63,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         {/* Quick Add to Cart button */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
-            onClick={(e) => handleAddToCart(e)}
+            onClick={handleAddToCart}
             className={`btn-primary text-sm ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!mainVariant?.available}
           >
@@ -89,33 +92,6 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               {product.productType} {product.vendor && `• ${product.vendor}`}
             </p>
           )}
-
-          {/* Material Selector */}
-          <div className="mb-4">
-            <p className="text-xs text-gray-500 mb-2">Material:</p>
-            <div className="flex gap-2">
-              {['Silver', 'Gold', 'Platinum'].map((material) => (
-                <button
-                  key={material}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedMaterial(material);
-                  }}
-                  className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${
-                    selectedMaterial === material 
-                      ? 'border-black scale-110' 
-                      : 'border-gray-300'
-                  }`}
-                  style={{
-                    backgroundColor: material === 'Gold' ? '#d4af37' : 
-                                   material === 'Platinum' ? '#E5E4E2' : '#C0C0C0'
-                  }}
-                  title={material}
-                />
-              ))}
-            </div>
-          </div>
           
           <div className="flex items-center justify-between mb-4">
             <p className="text-2xl font-semibold text-black">
@@ -138,7 +114,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         
         {/* FIXED: Button always at bottom */}
         <button 
-          onClick={(e) => handleAddToCart(e, selectedMaterial)}
+          onClick={handleAddToCart}
           className={`w-full btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={!mainVariant?.available}
         >
@@ -160,7 +136,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
                 Added to Cart
               </h3>
               <p className="text-sm text-gray-600 mb-1">{product.title}</p>
-              <p className="text-xs text-gray-500">{selectedMaterial} • ${mainVariant?.price}</p>
+              <p className="text-xs text-gray-500">${mainVariant?.price}</p>
             </div>
           </div>
         </div>
@@ -264,6 +240,12 @@ export default function Home() {
 
   return (
     <>
+      {/* Presale Banner */}
+      <PresaleBanner 
+        startDate="2024-07-10T21:00:00Z" // July 10th, 12pm PST / 9am HST
+        discount="20%" 
+      />
+      
       <main className="relative bg-white min-h-screen">
         {/* Enhanced Hero Section */}
         <HeroSection />
@@ -300,24 +282,7 @@ export default function Home() {
         {/* Newsletter Section */}
         <section className="py-20 px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="glass-card p-12 text-center">
-              <h3 className="text-3xl font-semibold tracking-tight text-black mb-4">
-                Stay In Touch
-              </h3>
-              <p className="text-gray-600 mb-8">
-                Be the first to know about new collections and exclusive offers.
-              </p>
-              <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-4">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-6 py-4 rounded-full bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-black placeholder-gray-500 transition-all duration-200"
-                />
-                <button className="btn-gold whitespace-nowrap">
-                  Subscribe
-                </button>
-              </div>
-            </div>
+            <NewsletterSignup />
           </div>
         </section>
       </main>
