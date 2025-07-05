@@ -1,7 +1,8 @@
-// src/components/ui/ContactForm.tsx - CREATE THIS NEW FILE
+// src/components/ui/ContactForm.tsx - REPLACE ENTIRE FILE
 'use client';
 
 import { useState } from 'react';
+import { analytics } from '../../lib/analytics';
 
 interface ContactFormProps {
   className?: string;
@@ -43,19 +44,39 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       ...formData,
       [e.target.name]: e.target.value
     });
+
+    // Track form field interactions for luxury customer insights
+    if (e.target.name === 'inquiryType') {
+      analytics.trackEvent('contact_form_inquiry_type_change', {
+        inquiry_type: e.target.value,
+        customer_intent: e.target.value === 'wholesale' ? 'high_value' : 'standard'
+      });
+    }
   };
 
   const validateForm = () => {
     if (!formData.name.trim()) {
       setErrorMessage('Please enter your name');
+      analytics.trackEvent('contact_form_validation_error', {
+        field: 'name',
+        error_type: 'required_field_missing'
+      });
       return false;
     }
     if (!formData.email.trim() || !formData.email.includes('@')) {
       setErrorMessage('Please enter a valid email address');
+      analytics.trackEvent('contact_form_validation_error', {
+        field: 'email',
+        error_type: 'invalid_format'
+      });
       return false;
     }
     if (!formData.message.trim()) {
       setErrorMessage('Please enter your message');
+      analytics.trackEvent('contact_form_validation_error', {
+        field: 'message',
+        error_type: 'required_field_missing'
+      });
       return false;
     }
     return true;
@@ -72,45 +93,139 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
     setStatus('loading');
     setErrorMessage('');
 
+    // Track form submission attempt
+    analytics.trackEvent('contact_form_submit_attempt', {
+      inquiry_type: formData.inquiryType,
+      has_phone: !!formData.phone,
+      message_length: formData.message.length,
+      email_domain: formData.email.split('@')[1] || 'unknown'
+    });
+
     try {
-      // Using same Formspree setup as newsletter (replace YOUR_CONTACT_FORM_ID)
-      const response = await fetch('https://formspree.io/f/YOUR_CONTACT_FORM_ID', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject || `${formData.inquiryType} inquiry from ${formData.name}`,
-          message: formData.message,
-          inquiryType: formData.inquiryType,
-          phone: formData.phone,
-          source: 'website_contact_form',
-          timestamp: new Date().toISOString(),
-          // Add some context for your inbox
-          _subject: `New ${formData.inquiryType} inquiry from ${formData.name}`,
-        }),
-      });
+      // HubSpot Form Submission
+      const hubspotPortalId = process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID;
+      const hubspotFormId = process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID;
+
+      if (!hubspotPortalId || !hubspotFormId) {
+        throw new Error('HubSpot configuration missing');
+      }
+
+      // Prepare HubSpot form data
+      const hubspotData = new URLSearchParams();
+      hubspotData.append('firstname', formData.name.split(' ')[0]);
+      hubspotData.append('lastname', formData.name.split(' ').slice(1).join(' ') || '');
+      hubspotData.append('email', formData.email);
+      hubspotData.append('subject', formData.subject || `${formData.inquiryType} inquiry`);
+      hubspotData.append('message', formData.message);
+      hubspotData.append('inquiry_type', formData.inquiryType);
+      if (formData.phone) {
+        hubspotData.append('phone', formData.phone);
+      }
+      
+      // Add tracking context
+      hubspotData.append('hs_context', JSON.stringify({
+        hutk: getCookie('hubspotutk'),
+        pageUri: window.location.href,
+        pageName: document.title,
+        source: 'website_contact_form',
+        timestamp: Date.now(),
+        luxury_brand: 'veliora_noir',
+        customer_segment: formData.inquiryType === 'wholesale' ? 'b2b' : 'b2c'
+      }));
+
+      const response = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${hubspotPortalId}/${hubspotFormId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: hubspotData.toString(),
+        }
+      );
 
       if (response.ok) {
         setStatus('success');
         
-        // Track successful contact form submission
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'contact_form_submit', {
-            event_category: 'engagement',
-            event_label: formData.inquiryType
+        // Track successful contact form submission across all platforms
+        analytics.contactFormSubmit(formData.inquiryType, formData.name);
+        
+        // Track high-value inquiry types separately
+        if (['wholesale', 'press'].includes(formData.inquiryType)) {
+          analytics.trackEvent('high_value_inquiry', {
+            inquiry_type: formData.inquiryType,
+            contact_method: 'contact_form',
+            estimated_value: formData.inquiryType === 'wholesale' ? 5000 : 1000
           });
         }
+
+        // Track customer quality indicators
+        const qualityScore = calculateCustomerQuality(formData);
+        analytics.trackEvent('customer_quality_score', {
+          score: qualityScore,
+          inquiry_type: formData.inquiryType,
+          factors: {
+            has_phone: !!formData.phone,
+            message_length: formData.message.length,
+            professional_email: isProfessionalEmail(formData.email)
+          }
+        });
+
       } else {
-        throw new Error('Failed to send message');
+        const errorData = await response.json();
+        console.error('HubSpot submission error:', errorData);
+        throw new Error('Failed to submit form to HubSpot');
       }
     } catch (error) {
       console.error('Contact form error:', error);
       setStatus('error');
-      setErrorMessage('Something went wrong. Please try again or email us directly.');
+      setErrorMessage('Something went wrong. Please try again or email us directly at help.velioranoir@gmail.com');
+      
+      // Track submission errors
+      analytics.trackEvent('contact_form_submission_error', {
+        error_message: error instanceof Error ? error.message : 'unknown_error',
+        inquiry_type: formData.inquiryType,
+        email_domain: formData.email.split('@')[1] || 'unknown'
+      });
     }
+  };
+
+  // Helper function to get HubSpot cookie
+  const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+  };
+
+  // Helper function to calculate customer quality score
+  const calculateCustomerQuality = (data: FormData): number => {
+    let score = 0;
+    
+    // Phone number provided (+20 points)
+    if (data.phone) score += 20;
+    
+    // Professional email domain (+15 points)
+    if (isProfessionalEmail(data.email)) score += 15;
+    
+    // Detailed message (+10 points)
+    if (data.message.length > 100) score += 10;
+    
+    // High-value inquiry type (+25 points)
+    if (['wholesale', 'press'].includes(data.inquiryType)) score += 25;
+    
+    // Complete form (+10 points)
+    if (data.subject) score += 10;
+    
+    return Math.min(score, 100); // Cap at 100
+  };
+
+  // Helper function to detect professional email
+  const isProfessionalEmail = (email: string): boolean => {
+    const domain = email.split('@')[1]?.toLowerCase() || '';
+    const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+    return !personalDomains.includes(domain);
   };
 
   const resetForm = () => {
@@ -124,6 +239,17 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
     });
     setStatus('idle');
     setErrorMessage('');
+    
+    analytics.trackEvent('contact_form_reset', {
+      user_action: 'new_inquiry'
+    });
+  };
+
+  const trackFormEngagement = (field: string) => {
+    analytics.trackEvent('contact_form_field_focus', {
+      field: field,
+      engagement_level: 'active_user'
+    });
   };
 
   if (status === 'success') {
@@ -136,24 +262,25 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             </svg>
           </div>
           <h3 className="text-2xl font-playfair font-bold text-black mb-4">
-            Message Sent Successfully
+            Message Received
           </h3>
           <p className="text-gray-600 mb-6">
-            Thank you for reaching out. We'll get back to you within 24 hours.
+            Thank you for reaching out. Our team will respond within 24 hours.
           </p>
           <div className="space-y-3">
             <p className="text-sm text-gray-500">
               <strong>What happens next:</strong>
             </p>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• We'll review your {formData.inquiryType} inquiry</li>
-              <li>• Expect a personalized response within 24 hours</li>
-              <li>• For sizing questions, we'll provide a detailed guide</li>
+              <li>• Your inquiry has been added to our CRM system</li>
+              <li>• You'll receive a personalized response within 24 hours</li>
+              <li>• For urgent matters, email help.velioranoir@gmail.com directly</li>
             </ul>
           </div>
           <button 
             onClick={resetForm}
             className="mt-6 btn-secondary"
+            data-luxury-action="contact_form_reset"
           >
             Send Another Message
           </button>
@@ -182,9 +309,11 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
               required
               value={formData.name}
               onChange={handleChange}
+              onFocus={() => trackFormEngagement('name')}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
               placeholder="Your name"
               disabled={status === 'loading'}
+              data-luxury-action="contact_name_input"
             />
           </div>
           
@@ -199,9 +328,11 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
               required
               value={formData.email}
               onChange={handleChange}
+              onFocus={() => trackFormEngagement('email')}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
               placeholder="your@email.com"
               disabled={status === 'loading'}
+              data-luxury-action="contact_email_input"
             />
           </div>
         </div>
@@ -217,9 +348,11 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            onFocus={() => trackFormEngagement('phone')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
             placeholder="+1 (555) 123-4567"
             disabled={status === 'loading'}
+            data-luxury-action="contact_phone_input"
           />
         </div>
 
@@ -233,8 +366,10 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             name="inquiryType"
             value={formData.inquiryType}
             onChange={handleChange}
+            onFocus={() => trackFormEngagement('inquiryType')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-gray-900"
             disabled={status === 'loading'}
+            data-luxury-action="contact_inquiry_type_select"
           >
             {inquiryTypes.map((type) => (
               <option key={type.value} value={type.value}>
@@ -255,9 +390,11 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             name="subject"
             value={formData.subject}
             onChange={handleChange}
+            onFocus={() => trackFormEngagement('subject')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
             placeholder="Brief subject line"
             disabled={status === 'loading'}
+            data-luxury-action="contact_subject_input"
           />
         </div>
 
@@ -273,9 +410,11 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             rows={6}
             value={formData.message}
             onChange={handleChange}
+            onFocus={() => trackFormEngagement('message')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 resize-none text-gray-900 placeholder-gray-500"
             placeholder="Tell us how we can help you..."
             disabled={status === 'loading'}
+            data-luxury-action="contact_message_input"
           />
         </div>
 
@@ -295,6 +434,7 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
               : 'bg-black text-white hover:bg-gray-800'
           }`}
+          data-luxury-action="contact_form_submit"
         >
           {status === 'loading' ? (
             <div className="flex items-center justify-center gap-2">

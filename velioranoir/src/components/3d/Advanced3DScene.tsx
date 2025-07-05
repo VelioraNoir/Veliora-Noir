@@ -1,8 +1,9 @@
-// src/components/3d/Advanced3DScene.tsx - Luxury Enhancements
+// src/components/3d/Advanced3DScene.tsx - REPLACE ENTIRE FILE
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { analytics } from '../../lib/analytics';
 
 interface Advanced3DViewerProps {
   className?: string;
@@ -30,6 +31,11 @@ export default function Advanced3DViewer({
   const [showParticles, setShowParticles] = useState(true);
   const mouseRef = useRef({ x: 0, y: 0 });
   const touchRef = useRef({ x: 0, y: 0 });
+  
+  // Analytics tracking state
+  const [sessionStartTime] = useState(Date.now());
+  const [totalInteractions, setTotalInteractions] = useState(0);
+  const [materialChanges, setMaterialChanges] = useState(0);
 
   const materials = [
     { name: 'Silver', color: 0xC0C0C0, metalness: 0.9, roughness: 0.1 },
@@ -44,6 +50,15 @@ export default function Advanced3DViewer({
     const container = containerRef.current;
     const width = container.clientWidth;
     const height = container.clientHeight;
+
+    // Track 3D viewer initialization
+    analytics.trackEvent('3d_viewer_init', {
+      viewer_type: 'advanced_3d',
+      webgl_supported: !!window.WebGLRenderingContext,
+      webgl2_supported: !!window.WebGL2RenderingContext,
+      screen_resolution: `${window.screen.width}x${window.screen.height}`,
+      viewport_size: `${width}x${height}`
+    });
 
     // Scene setup with luxury environment
     const scene = new THREE.Scene();
@@ -180,11 +195,18 @@ export default function Advanced3DViewer({
     const ringGlow = new THREE.Mesh(glowGeometry, glowMaterial);
     ring.add(ringGlow);
 
-    // Touch and mouse controls
+    // TOUCH AND MOUSE CONTROLS WITH ANALYTICS
     const handleTouchStart = (event: TouchEvent) => {
       setIsInteracting(true);
       const touch = event.touches[0];
       touchRef.current = { x: touch.clientX, y: touch.clientY };
+      
+      // Track touch interaction
+      analytics.trackEvent('3d_viewer_touch_start', {
+        interaction_type: 'touch',
+        device_type: 'mobile'
+      });
+      setTotalInteractions(prev => prev + 1);
     };
 
     const handleTouchMove = (event: TouchEvent) => {
@@ -202,11 +224,24 @@ export default function Advanced3DViewer({
 
     const handleTouchEnd = () => {
       setIsInteracting(false);
+      
+      // Track touch interaction end
+      analytics.trackEvent('3d_viewer_touch_end', {
+        total_interactions: totalInteractions + 1,
+        engagement_level: 'active'
+      });
     };
 
     const handleMouseDown = (event: MouseEvent) => {
       setIsInteracting(true);
       mouseRef.current = { x: event.clientX, y: event.clientY };
+      
+      // Track mouse interaction
+      analytics.trackEvent('3d_viewer_mouse_start', {
+        interaction_type: 'mouse',
+        device_type: 'desktop'
+      });
+      setTotalInteractions(prev => prev + 1);
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -223,6 +258,12 @@ export default function Advanced3DViewer({
 
     const handleMouseUp = () => {
       setIsInteracting(false);
+      
+      // Track mouse interaction end
+      analytics.trackEvent('3d_viewer_mouse_end', {
+        total_interactions: totalInteractions + 1,
+        engagement_level: 'active'
+      });
     };
 
     renderer.domElement.addEventListener('touchstart', handleTouchStart);
@@ -279,6 +320,13 @@ export default function Advanced3DViewer({
     };
     animate();
 
+    // Track 3D viewer load time
+    const loadEndTime = Date.now();
+    analytics.trackEvent('3d_viewer_load_complete', {
+      load_time_ms: loadEndTime - sessionStartTime,
+      performance_tier: loadEndTime - sessionStartTime < 1000 ? 'fast' : 'slow'
+    });
+
     // Resize handler
     const handleResize = () => {
       const newWidth = container.clientWidth;
@@ -287,6 +335,12 @@ export default function Advanced3DViewer({
       camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(newWidth, newHeight);
+      
+      // Track resize events for responsive design insights
+      analytics.trackEvent('3d_viewer_resize', {
+        new_size: `${newWidth}x${newHeight}`,
+        device_orientation: newWidth > newHeight ? 'landscape' : 'portrait'
+      });
     };
 
     window.addEventListener('resize', handleResize);
@@ -311,10 +365,19 @@ export default function Advanced3DViewer({
       
       renderer.dispose();
       pmremGenerator.dispose();
+
+      // Track 3D viewer session end
+      const sessionDuration = Date.now() - sessionStartTime;
+      analytics.trackEvent('3d_viewer_session_end', {
+        session_duration_ms: sessionDuration,
+        total_interactions: totalInteractions,
+        material_changes: materialChanges,
+        engagement_score: Math.min(100, (totalInteractions * 10) + (materialChanges * 20))
+      });
     };
   }, [showParticles]);
 
-  // Update material when changed
+  // Update material when changed WITH ANALYTICS
   useEffect(() => {
     if (!ringRef.current) return;
     
@@ -336,7 +399,50 @@ export default function Advanced3DViewer({
     if (glow && glow.material) {
       (glow.material as THREE.MeshBasicMaterial).color.setHex(currentMat.color);
     }
-  }, [material]);
+
+    // TRACK MATERIAL CHANGE
+    analytics.use3DViewer('demo-ring', true);
+    analytics.trackEvent('3d_viewer_material_change', {
+      old_material: materials.find(m => m.name !== material)?.name || 'unknown',
+      new_material: material,
+      material_value: getMaterialValue(material),
+      customization_engagement: 'high'
+    });
+    
+    setMaterialChanges(prev => prev + 1);
+  }, [material, materialChanges]);
+
+  // Helper function to get material value for analytics
+  const getMaterialValue = (materialName: string): number => {
+    const values = { Silver: 100, Gold: 300, Platinum: 500, Copper: 50 };
+    return values[materialName as keyof typeof values] || 100;
+  };
+
+  // Handle particle toggle with analytics
+  const handleParticleToggle = () => {
+    setShowParticles(!showParticles);
+    
+    analytics.trackEvent('3d_viewer_effects_toggle', {
+      effects_enabled: !showParticles,
+      user_preference: !showParticles ? 'enhanced_visuals' : 'performance_mode'
+    });
+  };
+
+  // Handle material selection with analytics
+  const handleMaterialChange = (materialName: string) => {
+    setMaterial(materialName);
+    
+    analytics.trackEvent('3d_viewer_material_select', {
+      material_selected: materialName,
+      selection_method: 'button_click',
+      luxury_tier: getMaterialTier(materialName)
+    });
+  };
+
+  const getMaterialTier = (materialName: string): string => {
+    const tiers = { Silver: 'standard', Gold: 'premium', Platinum: 'luxury', Copper: 'affordable' };
+    return tiers[materialName as keyof typeof tiers] || 'standard';
+  };
 
   return (
     <div className={`relative w-full h-[600px] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 ${className}`}>
@@ -354,8 +460,9 @@ export default function Advanced3DViewer({
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">Material:</span>
               <button 
-                onClick={() => setShowParticles(!showParticles)}
+                onClick={handleParticleToggle}
                 className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-200"
+                data-luxury-action="3d_effects_toggle"
               >
                 ✨ {showParticles ? 'Hide' : 'Show'} Effects
               </button>
@@ -364,12 +471,13 @@ export default function Advanced3DViewer({
               {materials.map((mat) => (
                 <button
                   key={mat.name}
-                  onClick={() => setMaterial(mat.name)}
+                  onClick={() => handleMaterialChange(mat.name)}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                     material === mat.name
                       ? 'bg-gray-900 text-white shadow-lg scale-105 ring-2 ring-gray-300'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-102'
                   }`}
+                  data-luxury-action="3d_material_select"
                 >
                   <div 
                     className="w-3 h-3 rounded-full border border-white/50 flex-shrink-0 shadow-sm"
@@ -398,6 +506,15 @@ export default function Advanced3DViewer({
           <span className="text-gray-700 font-medium">Real-time 3D</span>
         </div>
       </div>
+
+      {/* Interaction Stats (Development mode only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute bottom-4 left-4 bg-black/75 text-white text-xs p-2 rounded">
+          <div>Interactions: {totalInteractions}</div>
+          <div>Material Changes: {materialChanges}</div>
+          <div>Session: {Math.round((Date.now() - sessionStartTime) / 1000)}s</div>
+        </div>
+      )}
     </div>
   );
 }

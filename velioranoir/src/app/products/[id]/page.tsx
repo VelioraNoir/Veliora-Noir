@@ -1,4 +1,4 @@
-// src/app/products/[id]/page.tsx - CREATE THIS FILE (make sure directory structure is correct)
+// src/app/products/[id]/page.tsx - REPLACE ENTIRE FILE
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { getProduct, Product } from '../../../lib/shopify';
 import { useCartStore } from '../../../store/cartStore';
 import { ProductCardSkeleton, ErrorMessage } from '../../../components/ui/LoadingComponents';
+import { analytics } from '../../../lib/analytics';
 
 export default function ProductPage() {
   const params = useParams();
@@ -59,6 +60,12 @@ export default function ProductPage() {
       } catch (err) {
         console.error('Error loading product:', err);
         setError(err instanceof Error ? err.message : 'Failed to load product');
+        
+        // TRACK PRODUCT LOAD ERROR
+        analytics.trackEvent('product_load_error', {
+          product_id: productId,
+          error_message: err instanceof Error ? err.message : 'unknown_error'
+        });
       } finally {
         setLoading(false);
       }
@@ -66,6 +73,49 @@ export default function ProductPage() {
 
     loadProduct();
   }, [productId]);
+
+  // TRACK PRODUCT VIEW when product loads
+  useEffect(() => {
+    if (product) {
+      const selectedVariantData = product.variants.find(v => v.id === selectedVariant);
+      
+      // Track product view
+      analytics.productView(
+        product.id,
+        product.title,
+        selectedVariantData?.price || '0',
+        product.productType || 'Jewelry'
+      );
+      
+      // Track page view
+      analytics.pageView(`Product: ${product.title}`, 'product');
+    }
+  }, [product, selectedVariant]);
+
+  // TRACK MATERIAL SELECTION
+  const handleMaterialChange = (materialName: string) => {
+    setSelectedMaterial(materialName);
+    
+    analytics.trackEvent('product_material_change', {
+      product_id: product?.id || '',
+      product_name: product?.title || '',
+      material_selected: materialName,
+      engagement_type: 'customization'
+    });
+  };
+
+  // TRACK QUANTITY CHANGES
+  const handleQuantityChange = (newQuantity: number) => {
+    setQuantity(newQuantity);
+    
+    if (newQuantity > 1) {
+      analytics.trackEvent('product_quantity_increase', {
+        product_id: product?.id || '',
+        quantity: newQuantity,
+        customer_intent: 'high_value'
+      });
+    }
+  };
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
@@ -75,9 +125,60 @@ export default function ProductPage() {
 
     addItem(product, selectedVariant);
     
+    // TRACK ADD TO CART EVENT
+    analytics.addToCart(
+      product.id,
+      product.title,
+      variant.price,
+      quantity
+    );
+    
+    // TRACK LUXURY PURCHASE INTENT
+    const productValue = parseFloat(variant.price) * quantity;
+    if (productValue > 200) {
+      analytics.trackEvent('high_value_add_to_cart', {
+        product_id: product.id,
+        product_name: product.title,
+        value: productValue,
+        currency: 'USD',
+        customer_segment: 'luxury'
+      });
+    }
+    
     // Show luxury feedback
     setShowAddedFeedback(true);
     setTimeout(() => setShowAddedFeedback(false), 3000);
+  };
+
+  // TRACK IMAGE VIEWING
+  const handleImageChange = (index: number) => {
+    setSelectedImageIndex(index);
+    
+    analytics.trackEvent('product_image_view', {
+      product_id: product?.id || '',
+      image_index: index,
+      total_images: product?.images.length || 0,
+      engagement_level: 'detailed_browsing'
+    });
+  };
+
+  // TRACK WISHLIST AND SHARE ACTIONS
+  const handleWishlistClick = () => {
+    analytics.trackEvent('add_to_wishlist', {
+      product_id: product?.id || '',
+      product_name: product?.title || '',
+      price: selectedVariantData?.price || '0',
+      customer_intent: 'future_purchase'
+    });
+  };
+
+  const handleShareClick = () => {
+    analytics.trackEvent('product_share', {
+      product_id: product?.id || '',
+      product_name: product?.title || '',
+      share_method: 'button_click',
+      engagement_type: 'social_sharing'
+    });
   };
 
   const selectedVariantData = product?.variants.find(v => v.id === selectedVariant);
@@ -115,9 +216,21 @@ export default function ProductPage() {
         {/* Breadcrumb */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-8">
-            <Link href="/" className="hover:text-gray-700">Home</Link>
+            <Link 
+              href="/" 
+              className="hover:text-gray-700"
+              onClick={() => analytics.trackEvent('breadcrumb_click', { destination: 'home' })}
+            >
+              Home
+            </Link>
             <span>/</span>
-            <Link href="/collections" className="hover:text-gray-700">Collections</Link>
+            <Link 
+              href="/collections" 
+              className="hover:text-gray-700"
+              onClick={() => analytics.trackEvent('breadcrumb_click', { destination: 'collections' })}
+            >
+              Collections
+            </Link>
             <span>/</span>
             <span className="text-gray-900">{product.title}</span>
           </nav>
@@ -151,12 +264,13 @@ export default function ProductPage() {
                   {product.images.map((image, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedImageIndex(index)}
+                      onClick={() => handleImageChange(index)}
                       className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden ${
                         selectedImageIndex === index 
                           ? 'ring-2 ring-gray-900' 
                           : 'hover:opacity-75'
                       }`}
+                      data-luxury-action="product_image_thumbnail"
                     >
                       <Image
                         src={image.src}
@@ -218,12 +332,13 @@ export default function ProductPage() {
                   {materials.map((material) => (
                     <button
                       key={material.name}
-                      onClick={() => setSelectedMaterial(material.name)}
+                      onClick={() => handleMaterialChange(material.name)}
                       className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center gap-2 ${
                         selectedMaterial === material.name
                           ? 'border-gray-900 bg-gray-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      data-luxury-action="material_selection"
                     >
                       <div 
                         className="w-4 h-4 rounded-full border border-gray-300"
@@ -240,15 +355,17 @@ export default function ProductPage() {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Quantity</h3>
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
                     className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    data-luxury-action="quantity_decrease"
                   >
                     -
                   </button>
                   <span className="font-medium w-8 text-center">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => handleQuantityChange(quantity + 1)}
                     className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    data-luxury-action="quantity_increase"
                   >
                     +
                   </button>
@@ -265,16 +382,25 @@ export default function ProductPage() {
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
                   }`}
+                  data-luxury-action="add_to_cart_main"
                 >
                   {!isAvailable ? 'Sold Out' : 'Add to Cart'}
                 </button>
 
                 {/* Additional Actions */}
                 <div className="flex gap-4">
-                  <button className="flex-1 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-50">
+                  <button 
+                    onClick={handleWishlistClick}
+                    className="flex-1 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-50"
+                    data-luxury-action="add_to_wishlist"
+                  >
                     Add to Wishlist
                   </button>
-                  <button className="flex-1 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-50">
+                  <button 
+                    onClick={handleShareClick}
+                    className="flex-1 py-3 border border-gray-300 rounded-full font-medium hover:bg-gray-50"
+                    data-luxury-action="share_product"
+                  >
                     Share
                   </button>
                 </div>
@@ -282,7 +408,17 @@ export default function ProductPage() {
 
               {/* Product Details */}
               <div className="space-y-4 pt-8 border-t border-gray-200">
-                <details className="group">
+                <details 
+                  className="group"
+                  onToggle={(e) => {
+                    if ((e.target as HTMLDetailsElement).open) {
+                      analytics.trackEvent('product_details_expand', {
+                        product_id: product.id,
+                        section: 'product_details'
+                      });
+                    }
+                  }}
+                >
                   <summary className="flex justify-between items-center cursor-pointer font-medium text-gray-900">
                     Product Details
                     <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,7 +433,17 @@ export default function ProductPage() {
                   </div>
                 </details>
 
-                <details className="group">
+                <details 
+                  className="group"
+                  onToggle={(e) => {
+                    if ((e.target as HTMLDetailsElement).open) {
+                      analytics.trackEvent('product_details_expand', {
+                        product_id: product.id,
+                        section: 'shipping_returns'
+                      });
+                    }
+                  }}
+                >
                   <summary className="flex justify-between items-center cursor-pointer font-medium text-gray-900">
                     Shipping & Returns
                     <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,7 +458,17 @@ export default function ProductPage() {
                   </div>
                 </details>
 
-                <details className="group">
+                <details 
+                  className="group"
+                  onToggle={(e) => {
+                    if ((e.target as HTMLDetailsElement).open) {
+                      analytics.trackEvent('product_details_expand', {
+                        product_id: product.id,
+                        section: 'care_instructions'
+                      });
+                    }
+                  }}
+                >
                   <summary className="flex justify-between items-center cursor-pointer font-medium text-gray-900">
                     Care Instructions
                     <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
