@@ -2,17 +2,20 @@
 'use client';
 
 import { useState } from 'react';
+import { analytics } from '../../lib/analytics';
 
 interface NewsletterSignupProps {
   className?: string;
   title?: string;
   description?: string;
+  source?: string; // Track where signup came from
 }
 
 export default function NewsletterSignup({ 
   className = "",
   title = "Stay In Touch",
-  description = "Be the first to know about new collections and exclusive offers."
+  description = "Be the first to know about new collections and exclusive offers.",
+  source = "homepage"
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -24,13 +27,25 @@ export default function NewsletterSignup({
     if (!email || !email.includes('@')) {
       setStatus('error');
       setMessage('Please enter a valid email address');
+      
+      // Track failed validation
+      analytics.trackEvent('newsletter_validation_error', {
+        error_type: 'invalid_email',
+        source: source
+      });
       return;
     }
 
     setStatus('loading');
 
+    // Track newsletter signup attempt
+    analytics.trackEvent('newsletter_signup_attempt', {
+      source: source,
+      email_domain: email.split('@')[1] || 'unknown'
+    });
+
     try {
-      // Klaviyo API Integration
+      // Call our Klaviyo API endpoint
       const response = await fetch('/api/klaviyo-subscribe', {
         method: 'POST',
         headers: {
@@ -38,7 +53,7 @@ export default function NewsletterSignup({
         },
         body: JSON.stringify({
           email: email,
-          source: 'website_newsletter',
+          source: `website_newsletter_${source}`,
           timestamp: new Date().toISOString(),
         }),
       });
@@ -47,24 +62,55 @@ export default function NewsletterSignup({
 
       if (response.ok) {
         setStatus('success');
-        setMessage('Thank you! You\'re now subscribed to our newsletter.');
-        setEmail('');
+        setMessage('Welcome to our exclusive community!');
         
-        // Track successful signup
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', 'newsletter_signup', {
-            event_category: 'engagement',
-            event_label: 'homepage'
-          });
-        }
+        // Track successful newsletter signup with all platforms
+        analytics.newsletterSignup(email, source);
+        
+        // Additional presale-specific tracking
+        analytics.presaleInterest(email, source);
+        
+        // Track conversion value for luxury brand
+        analytics.trackEvent('newsletter_conversion', {
+          source: source,
+          customer_lifetime_value: 250, // Estimated CLV for luxury jewelry
+          conversion_type: 'email_signup'
+        });
+
+        setEmail('');
       } else {
-        throw new Error(data.message || 'Failed to subscribe');
+        throw new Error(data.error || 'Failed to subscribe');
       }
     } catch (error) {
       console.error('Newsletter signup error:', error);
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      
+      // Track signup errors for optimization
+      analytics.trackEvent('newsletter_signup_error', {
+        error_message: error instanceof Error ? error.message : 'unknown_error',
+        source: source,
+        email_domain: email.split('@')[1] || 'unknown'
+      });
+      
+      if (error instanceof Error && error.message.includes('already subscribed')) {
+        setMessage('You\'re already subscribed! Check your email for updates.');
+        
+        // Track existing subscriber attempts
+        analytics.trackEvent('newsletter_existing_subscriber', {
+          source: source,
+          email_domain: email.split('@')[1] || 'unknown'
+        });
+      } else {
+        setMessage('Something went wrong. Please try again or email us directly.');
+      }
     }
+  };
+
+  const trackInputFocus = () => {
+    analytics.trackEvent('newsletter_input_focus', {
+      source: source,
+      engagement_level: 'high_intent'
+    });
   };
 
   return (
@@ -88,9 +134,19 @@ export default function NewsletterSignup({
             </div>
             <h4 className="font-medium text-green-900 mb-2">Welcome to Veliora Noir!</h4>
             <p className="text-green-700 text-sm">{message}</p>
-            <p className="text-green-600 text-xs mt-2">You'll be the first to know about our July 10th presale!</p>
+            <div className="mt-4 space-y-2 text-xs text-green-600">
+              <p>✨ You'll receive exclusive presale access</p>
+              <p>🚀 Be first to know about our July 10th launch</p>
+              <p>💎 Special member-only offers and content</p>
+            </div>
             <button 
-              onClick={() => setStatus('idle')}
+              onClick={() => {
+                setStatus('idle');
+                analytics.trackEvent('newsletter_signup_another', {
+                  source: source,
+                  user_type: 'multi_subscriber'
+                });
+              }}
               className="mt-4 text-sm text-green-600 hover:text-green-700 underline"
             >
               Subscribe another email
@@ -104,10 +160,12 @@ export default function NewsletterSignup({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={trackInputFocus}
               placeholder="Enter your email"
               className="flex-1 px-6 py-4 rounded-full bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-200"
               disabled={status === 'loading'}
               required
+              data-luxury-action="email_input_focus"
             />
             <button 
               type="submit"
@@ -115,6 +173,13 @@ export default function NewsletterSignup({
               className={`btn-gold whitespace-nowrap px-8 py-4 ${
                 status === 'loading' ? 'opacity-50 cursor-not-allowed' : ''
               }`}
+              data-luxury-action="newsletter_subscribe"
+              onClick={() => {
+                analytics.trackEvent('newsletter_subscribe_click', {
+                  source: source,
+                  email_provided: !!email
+                });
+              }}
             >
               {status === 'loading' ? (
                 <div className="flex items-center gap-2">
@@ -128,12 +193,15 @@ export default function NewsletterSignup({
           </div>
           
           {status === 'error' && (
-            <p className="mt-4 text-red-600 text-sm">{message}</p>
+            <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-700 text-sm">{message}</p>
+            </div>
           )}
           
-          <p className="mt-4 text-xs text-gray-500">
-            Join our exclusive list for presale access. Unsubscribe anytime.
-          </p>
+          <div className="mt-4 space-y-2 text-xs text-gray-500">
+            <p>Join our exclusive list for presale access on July 10th</p>
+            <p>Unsubscribe anytime • We respect your privacy</p>
+          </div>
         </form>
       )}
     </div>

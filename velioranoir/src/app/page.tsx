@@ -13,8 +13,9 @@ import PresaleBanner from '../components/ui/PresaleBanner';
 import SearchModal from '../components/ui/SearchModal';
 import NewsletterSignup from '../components/ui/NewsletterSignup';
 import Footer from '../components/layout/Footer';
+import { analytics } from '../lib/analytics';
 
-// Enhanced Product Card with Cart Integration and Links - FIXED BUTTON ALIGNMENT
+// Enhanced Product Card with Cart Integration and Links - WITH ANALYTICS
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
@@ -35,17 +36,37 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
       console.log('Adding to cart:', product.title, mainVariant.available);
       addItem(product, mainVariant.id);
       
+      // TRACK ADD TO CART EVENT
+      analytics.addToCart(
+        product.id,
+        product.title,
+        mainVariant.price,
+        1
+      );
+      
       // Show luxury feedback
       setShowAddedFeedback(true);
       setTimeout(() => setShowAddedFeedback(false), 3000);
     }
   };
 
+  const handleProductClick = () => {
+    // TRACK PRODUCT VIEW
+    analytics.productView(
+      product.id,
+      product.title,
+      mainVariant?.price || '0',
+      product.productType || 'Jewelry'
+    );
+  };
+
   return (
     <Link 
       href={`/products/${encodeURIComponent(product.id)}`}
+      onClick={handleProductClick}
       className="block product-card rounded-2xl overflow-hidden animate-fade-in-up group h-full flex flex-col"
       style={{ animationDelay: `${index * 100}ms` }}
+      data-luxury-action="product_card_click"
     >
       <div className="product-card-image aspect-square relative">
         <Image
@@ -66,6 +87,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
             onClick={handleAddToCart}
             className={`btn-primary text-sm ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!mainVariant?.available}
+            data-luxury-action="quick_add_to_cart"
           >
             {mainVariant?.available ? 'Quick Add' : 'Sold Out'}
           </button>
@@ -117,6 +139,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
           onClick={handleAddToCart}
           className={`w-full btn-secondary ${!mainVariant?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={!mainVariant?.available}
+          data-luxury-action="add_to_cart"
         >
           {mainVariant?.available ? 'Add to Cart' : 'Sold Out'}
         </button>
@@ -161,10 +184,20 @@ const HeroSection = () => {
               where timeless elegance meets contemporary sophistication.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center animate-fade-in-up delay-300">
-              <Link href="/collections" className="btn-primary">
+              <Link 
+                href="/collections" 
+                className="btn-primary"
+                data-luxury-action="hero_explore_collections"
+                onClick={() => analytics.trackEvent('hero_cta_click', { cta_type: 'explore_collection' })}
+              >
                 Explore Collection
               </Link>
-              <Link href="/about" className="btn-secondary">
+              <Link 
+                href="/about" 
+                className="btn-secondary"
+                data-luxury-action="hero_our_story"
+                onClick={() => analytics.trackEvent('hero_cta_click', { cta_type: 'our_story' })}
+              >
                 Our Story
               </Link>
             </div>
@@ -216,14 +249,50 @@ export default function Home() {
         setLoading(true);
         const fetchedProducts = await getAllProductsWithFallback();
         setProducts(fetchedProducts);
+        
+        // TRACK PAGE VIEW
+        analytics.pageView('Homepage', 'main');
+        
+        // TRACK PRODUCT COLLECTION VIEW
+        analytics.viewCategory('Featured Products', fetchedProducts.length);
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load products');
+        
+        // TRACK ERROR
+        analytics.trackEvent('homepage_load_error', {
+          error_message: err instanceof Error ? err.message : 'unknown_error'
+        });
       } finally {
         setLoading(false);
       }
     };
 
     loadProducts();
+  }, []);
+
+  // Track scroll engagement
+  useEffect(() => {
+    let scrollTracked = false;
+    
+    const handleScroll = () => {
+      if (scrollTracked) return;
+      
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+      );
+      
+      if (scrollPercent >= 50) {
+        analytics.trackEvent('homepage_scroll_engagement', {
+          scroll_depth: scrollPercent,
+          engagement_level: 'high'
+        });
+        scrollTracked = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (error) {
@@ -242,7 +311,7 @@ export default function Home() {
     <>
       {/* Presale Banner */}
       <PresaleBanner 
-        startDate="2024-07-10T21:00:00Z" // July 10th, 12pm PST / 9am HST
+        startDate="2024-07-10T20:00:00Z" // July 10th, 12pm PST / 9am HST
         discount="20%" 
       />
       
@@ -272,7 +341,12 @@ export default function Home() {
 
             {/* Load More Button */}
             <div className="text-center mt-16">
-              <Link href="/collections" className="btn-secondary">
+              <Link 
+                href="/collections" 
+                className="btn-secondary"
+                data-luxury-action="view_all_accessories"
+                onClick={() => analytics.trackEvent('view_all_products_click', { source: 'homepage' })}
+              >
                 View All Accessories
               </Link>
             </div>
@@ -282,7 +356,7 @@ export default function Home() {
         {/* Newsletter Section */}
         <section className="py-20 px-8">
           <div className="max-w-4xl mx-auto">
-            <NewsletterSignup />
+            <NewsletterSignup source="homepage" />
           </div>
         </section>
       </main>
