@@ -1,9 +1,10 @@
-// src/components/layout/Header.tsx - REPLACE ENTIRE FILE
+// src/components/layout/Header.tsx - UPDATED WITH WISHLIST
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '../../store/cartStore';
+import { useWishlistStore } from '../../store/wishlistStore';
 import SearchModal from '../ui/SearchModal';
 
 const Header = () => {
@@ -12,6 +13,7 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const { toggleCart, getTotalItems } = useCartStore();
+  const { getTotalItems: getWishlistItems } = useWishlistStore();
 
   useEffect(() => {
     setIsMounted(true);
@@ -94,14 +96,19 @@ const Header = () => {
               </button>
 
               {/* Wishlist Button */}
-              <button className="p-2 text-gray-700 hover:text-black transition-colors duration-200 relative">
+              <Link 
+                href="/wishlist"
+                className="p-2 text-gray-700 hover:text-black transition-colors duration-200 relative"
+              >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  2
-                </span>
-              </button>
+                {isMounted && getWishlistItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {getWishlistItems()}
+                  </span>
+                )}
+              </Link>
 
               {/* Cart Button */}
               <button 
@@ -162,6 +169,23 @@ const Header = () => {
                   </svg>
                   Search
                 </button>
+
+                {/* Mobile Wishlist */}
+                <Link
+                  href="/wishlist"
+                  className="text-gray-800 hover:text-black transition-colors duration-200 font-medium py-3 px-2 rounded-lg hover:bg-gray-100 min-h-[48px] flex items-center gap-3"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  Wishlist
+                  {isMounted && getWishlistItems() > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {getWishlistItems()}
+                    </span>
+                  )}
+                </Link>
               </div>
             </div>
           )}

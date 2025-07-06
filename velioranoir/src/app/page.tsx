@@ -1,4 +1,4 @@
-// src/app/page.tsx - REPLACE ENTIRE FILE
+// src/app/page.tsx - UPDATED WITH WISHLIST
 'use client';
 
 import Image from 'next/image';
@@ -9,6 +9,7 @@ import { ProductCardSkeleton, ErrorMessage } from '../components/ui/LoadingCompo
 import Advanced3DViewer from '../components/3d/Advanced3DScene';
 import CartDrawer from '../components/cart/CartDrawer';
 import { useCartStore } from '../store/cartStore';
+import { useWishlistStore } from '../store/wishlistStore';
 import PresaleBanner from '../components/ui/PresaleBanner';
 import SearchModal from '../components/ui/SearchModal';
 import NewsletterSignup from '../components/ui/NewsletterSignup';
@@ -16,11 +17,12 @@ import Footer from '../components/layout/Footer';
 import { analytics } from '../lib/analytics';
 import AnalyticsTest from '../components/debug/AnalyticsTest';
 
-// Enhanced Product Card with Cart Integration and Links - WITH ANALYTICS
+// Enhanced Product Card with Cart Integration and Links - WITH ANALYTICS & WISHLIST
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const { addItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   
   const mainImage = product.images[0];
   const mainVariant = product.variants[0];
@@ -28,6 +30,19 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isMounted) {
+      if (isInWishlist(product.id)) {
+        removeFromWishlist(product.id);
+      } else {
+        addToWishlist(product);
+      }
+    }
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking add to cart
@@ -81,6 +96,21 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+        
+        {/* Wishlist Button */}
+        <button
+          onClick={handleWishlistToggle}
+          className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+            isMounted && isInWishlist(product.id)
+              ? 'bg-red-500 text-white' 
+              : 'bg-white/90 hover:bg-white text-gray-700 hover:text-red-500'
+          }`}
+          data-luxury-action="wishlist_toggle"
+        >
+          <svg className="w-4 h-4" fill={isMounted && isInWishlist(product.id) ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
         
         {/* Quick Add to Cart button */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
