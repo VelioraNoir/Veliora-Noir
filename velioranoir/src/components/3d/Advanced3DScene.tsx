@@ -410,7 +410,7 @@ export default function Advanced3DViewer({
     });
     
     setMaterialChanges(prev => prev + 1);
-  }, [material, materialChanges]);
+  }, [material]);
 
   // Helper function to get material value for analytics
   const getMaterialValue = (materialName: string): number => {

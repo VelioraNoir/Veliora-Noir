@@ -14,6 +14,7 @@ import SearchModal from '../components/ui/SearchModal';
 import NewsletterSignup from '../components/ui/NewsletterSignup';
 import Footer from '../components/layout/Footer';
 import { analytics } from '../lib/analytics';
+import AnalyticsTest from '../components/debug/AnalyticsTest';
 
 // Enhanced Product Card with Cart Integration and Links - WITH ANALYTICS
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
@@ -363,6 +364,9 @@ export default function Home() {
 
       {/* Cart Drawer */}
       <CartDrawer />
+
+      {/* Temporary analytics testing
+      <AnalyticsTest /> */}
     </>
   );
 }
