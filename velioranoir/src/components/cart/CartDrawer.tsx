@@ -238,12 +238,7 @@ const CartDrawer = () => {
                 onClick={handleToggleCart}
                 className="px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800"
                 data-luxury-action="continue_shopping"
-                onClick={() => {
-                  handleToggleCart();
-                  analytics.trackEvent('continue_shopping_click', {
-                    source: 'empty_cart'
-                  });
-                }}
+                 
               >
                 Continue Shopping
               </button>

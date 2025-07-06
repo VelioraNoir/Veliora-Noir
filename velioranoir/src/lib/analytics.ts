@@ -5,7 +5,10 @@ declare global {
   interface Window {
     gtag: (...args: any[]) => void;
     fbq: (...args: any[]) => void;
-    ttq: (...args: any[]) => void;
+    ttq: {
+      track: (eventName: string, parameters?: Record<string, any>) => void;
+      [key: string]: any;
+    };
     dataLayer: any[];
     _hsq: any[];
   }
@@ -69,6 +72,8 @@ export const trackEvent = (eventName: string, data: Record<string, any> = {}) =>
 // Specific luxury jewelry business events
 export const analytics = {
   // Newsletter and email events
+  trackEvent,
+
   newsletterSignup: (email: string, source: string = 'website') => {
     trackEvent('subscribe', {
       method: 'email',
