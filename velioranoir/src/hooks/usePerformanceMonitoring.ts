@@ -1,4 +1,4 @@
-// src/hooks/usePerformanceMonitoring.ts - NEW FILE
+// src/hooks/usePerformanceMonitoring.ts - FIXED VERSION
 'use client';
 
 import { useEffect } from 'react';
@@ -28,7 +28,7 @@ export function usePerformanceMonitoring() {
         metrics.lcp = lastEntry.startTime;
         
         // Report if LCP is poor (>2.5s)
-        if (metrics.lcp > 2500) {
+        if (metrics.lcp && metrics.lcp > 2500) {
           console.warn('🐌 Poor LCP detected:', metrics.lcp + 'ms');
         }
       });
@@ -46,7 +46,7 @@ export function usePerformanceMonitoring() {
           metrics.fid = entry.processingStart - entry.startTime;
           
           // Report if FID is poor (>100ms)
-          if (metrics.fid > 100) {
+          if (metrics.fid && metrics.fid > 100) {
             console.warn('🐌 Poor FID detected:', metrics.fid + 'ms');
           }
         });
@@ -72,7 +72,7 @@ export function usePerformanceMonitoring() {
         metrics.cls = clsValue;
         
         // Report if CLS is poor (>0.1)
-        if (metrics.cls > 0.1) {
+        if (metrics.cls && metrics.cls > 0.1) {
           console.warn('🐌 Poor CLS detected:', metrics.cls);
         }
       });
@@ -122,10 +122,10 @@ export function usePerformanceMonitoring() {
           
           // Log performance summary
           console.log('📊 Performance Metrics:', {
-            'TTFB': metrics.ttfb + 'ms',
-            'LCP': metrics.lcp + 'ms',
-            'FID': metrics.fid + 'ms',
-            'CLS': metrics.cls
+            'TTFB': (metrics.ttfb || 0) + 'ms',
+            'LCP': (metrics.lcp || 0) + 'ms',
+            'FID': (metrics.fid || 0) + 'ms',
+            'CLS': metrics.cls || 0
           });
         }
       }, 1000);
@@ -137,4 +137,3 @@ export function usePerformanceMonitoring() {
     };
   }, []);
 }
-
