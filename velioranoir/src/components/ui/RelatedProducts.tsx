@@ -1,4 +1,4 @@
-// src/components/ui/RelatedProducts.tsx - NEW FILE
+// src/components/ui/RelatedProducts.tsx - FIXED WISHLIST BUTTONS
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -99,8 +99,10 @@ export default function RelatedProducts({ currentProduct, maxItems = 4 }: Relate
     if (isMounted) {
       if (isInWishlist(product.id)) {
         removeFromWishlist(product.id);
+        console.log('Removed from wishlist:', product.title);
       } else {
         addToWishlist(product);
+        console.log('Added to wishlist:', product.title);
       }
     }
   };
@@ -152,21 +154,22 @@ export default function RelatedProducts({ currentProduct, maxItems = 4 }: Relate
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                     
-                    {/* Wishlist Button */}
+                    {/* FIXED Wishlist Button */}
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleWishlistToggle(product);
                       }}
-                      className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                      className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
                         isMounted && isInWishlist(product.id)
-                          ? 'bg-red-500 text-white' 
-                          : 'bg-white/90 hover:bg-white text-gray-700 hover:text-red-500'
+                          ? 'bg-red-500 text-white hover:bg-red-600' 
+                          : 'bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 border border-gray-200'
                       }`}
+                      title={isMounted && isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                     >
-                      <svg className="w-4 h-4" fill={isMounted && isInWishlist(product.id) ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <svg className="w-4 h-4" fill={isMounted && isInWishlist(product.id) ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </button>
 

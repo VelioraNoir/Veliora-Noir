@@ -1,8 +1,7 @@
-// src/store/wishlistStore.ts - NEW FILE
+// src/store/wishlistStore.ts - FIXED FILE (renamed from .tsx to .ts)
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '../lib/shopify';
-import { analytics } from '../lib/analytics';
 
 interface WishlistItem {
   id: string;
@@ -38,13 +37,7 @@ export const useWishlistStore = create<WishlistStore>()(
             items: [...state.items, newItem]
           }));
           
-          // Track wishlist addition
-          analytics.trackEvent('add_to_wishlist', {
-            product_id: product.id,
-            product_name: product.title,
-            price: product.variants[0]?.price || '0',
-            customer_intent: 'future_purchase'
-          });
+          console.log('Added to wishlist:', product.title);
         }
       },
 
@@ -56,12 +49,7 @@ export const useWishlistStore = create<WishlistStore>()(
         }));
         
         if (item) {
-          // Track wishlist removal
-          analytics.trackEvent('remove_from_wishlist', {
-            product_id: productId,
-            product_name: item.product.title,
-            time_in_wishlist: Date.now() - item.addedAt.getTime()
-          });
+          console.log('Removed from wishlist:', item.product.title);
         }
       },
 
@@ -72,12 +60,7 @@ export const useWishlistStore = create<WishlistStore>()(
       clearWishlist: () => {
         const itemCount = get().items.length;
         set({ items: [] });
-        
-        // Track wishlist clear
-        analytics.trackEvent('wishlist_clear', {
-          items_count: itemCount,
-          user_action: 'clear_all'
-        });
+        console.log('Cleared wishlist:', itemCount, 'items');
       },
 
       getTotalItems: () => {
