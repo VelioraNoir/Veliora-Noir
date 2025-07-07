@@ -1,4 +1,4 @@
-// src/components/layout/Footer.tsx
+// src/components/layout/Footer.tsx - UPDATED VERSION
 import Link from 'next/link';
 
 const Footer = () => {
@@ -6,41 +6,29 @@ const Footer = () => {
     {
       title: 'Collections',
       links: [
+        { name: 'All Collections', href: '/collections' },
         { name: 'Rings', href: '/collections/rings' },
         { name: 'Necklaces', href: '/collections/necklaces' },
         { name: 'Bracelets', href: '/collections/bracelets' },
         { name: 'Earrings', href: '/collections/earrings' },
-        { name: 'New Arrivals', href: '/collections/new' },
       ],
     },
     {
       title: 'Customer Care',
       links: [
-        { name: 'Size Guide', href: '/size-guide' },
-        { name: 'Care Instructions', href: '/care' },
+        { name: 'Care Instructions', href: '/care', description: 'How to maintain your jewelry' },
         { name: 'Shipping Info', href: '/shipping' },
-        { name: 'Returns & Exchanges', href: '/returns' },
-        { name: 'Warranty', href: '/warranty' },
-      ],
-    },
-    {
-      title: 'Company',
-      links: [
-        { name: 'About Us', href: '/about' },
-        { name: 'Craftsmanship', href: '/craftsmanship' },
-        { name: 'Sustainability', href: '/sustainability' },
-        { name: 'Press', href: '/press' },
-        { name: 'Careers', href: '/careers' },
+        { name: 'Returns Policy', href: '/returns' },
+        { name: 'Track Your Order', href: '/track', description: 'Shopify order tracking' },
       ],
     },
     {
       title: 'Support',
       links: [
         { name: 'Contact Us', href: '/contact' },
-        { name: 'FAQ', href: '/faq' },
-        { name: 'Track Order', href: '/track' },
-        { name: 'Book Consultation', href: '/consultation' },
-        { name: 'Store Locator', href: '/stores' },
+        { name: 'FAQ', href: '/faq', description: 'Common questions answered' },
+        { name: 'About Us', href: '/about' },
+        { name: 'Wishlist', href: '/wishlist' },
       ],
     },
   ];
@@ -84,28 +72,38 @@ const Footer = () => {
     },
   ];
 
+  // Payment methods that Shopify typically supports
+  const paymentMethods = [
+    { name: 'Visa', icon: 'VISA' },
+    { name: 'Mastercard', icon: 'MC' },
+    { name: 'American Express', icon: 'AMEX' },
+    { name: 'PayPal', icon: 'PP' },
+    { name: 'Apple Pay', icon: 'AP' },
+    { name: 'Google Pay', icon: 'GP' },
+  ];
+
   return (
-    <footer className="bg-gradient-to-br from-metallic-charcoal-900 via-metallic-charcoal-800 to-metallic-charcoal-900 text-metallic-platinum-200">
+    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-1 space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-metallic-gold-400 to-metallic-gold-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
                 <span className="text-white font-playfair font-bold text-xl">VN</span>
               </div>
               <div>
-                <h3 className="font-playfair text-xl font-medium text-metallic-platinum-100">
+                <h3 className="font-playfair text-xl font-medium text-white">
                   Veliora Noir
                 </h3>
-                <p className="text-sm text-metallic-platinum-400">
+                <p className="text-sm text-gray-400">
                   Luxury Metallics
                 </p>
               </div>
             </div>
             
-            <p className="text-metallic-platinum-300 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               Crafting timeless metallic accessories with unparalleled attention to detail and sophisticated elegance.
             </p>
 
@@ -115,8 +113,10 @@ const Footer = () => {
                 <a
                   key={social.name}
                   href={social.href}
-                  className="w-10 h-10 bg-metallic-charcoal-700 hover:bg-metallic-gold-500 rounded-full flex items-center justify-center transition-colors duration-300"
+                  className="w-10 h-10 bg-gray-700 hover:bg-yellow-500 rounded-full flex items-center justify-center transition-colors duration-300"
                   aria-label={social.name}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {social.icon}
                 </a>
@@ -127,7 +127,7 @@ const Footer = () => {
           {/* Footer Links */}
           {footerSections.map((section) => (
             <div key={section.title} className="space-y-4">
-              <h4 className="font-playfair text-lg font-medium text-metallic-platinum-100">
+              <h4 className="font-playfair text-lg font-medium text-white">
                 {section.title}
               </h4>
               <ul className="space-y-3">
@@ -135,9 +135,15 @@ const Footer = () => {
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-metallic-platinum-300 hover:text-metallic-gold-400 transition-colors duration-200"
+                      className="text-gray-300 hover:text-yellow-400 transition-colors duration-200 block"
+                      title={link.description}
                     >
                       {link.name}
+                      {link.description && (
+                        <span className="block text-xs text-gray-500 mt-1">
+                          {link.description}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ))}
@@ -147,13 +153,13 @@ const Footer = () => {
         </div>
 
         {/* Newsletter Signup */}
-        <div className="mt-12 pt-8 border-t border-metallic-charcoal-700">
+        <div className="mt-12 pt-8 border-t border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h4 className="font-playfair text-xl font-medium text-metallic-platinum-100 mb-2">
+              <h4 className="font-playfair text-xl font-medium text-white mb-2">
                 Stay Updated
               </h4>
-              <p className="text-metallic-platinum-300">
+              <p className="text-gray-300">
                 Get notified about new collections, exclusive offers, and craftsmanship insights.
               </p>
             </div>
@@ -161,9 +167,9 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-6 py-3 bg-metallic-charcoal-700 border border-metallic-charcoal-600 rounded-full text-metallic-platinum-200 placeholder-metallic-platinum-400 focus:outline-none focus:ring-2 focus:ring-metallic-gold-500 focus:border-transparent"
+                className="flex-1 px-6 py-3 bg-gray-700 border border-gray-600 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               />
-              <button className="px-8 py-3 bg-metallic-gold-500 hover:bg-metallic-gold-400 text-metallic-charcoal-900 font-medium rounded-full transition-colors duration-300">
+              <button className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-medium rounded-full transition-colors duration-300">
                 Subscribe
               </button>
             </div>
@@ -172,38 +178,46 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-metallic-charcoal-700">
+      <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-metallic-platinum-400">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
               <p>&copy; 2024 Veliora Noir. All rights reserved.</p>
               <div className="flex space-x-6">
-                <Link href="/privacy" className="hover:text-metallic-gold-400 transition-colors duration-200">
+                <Link href="/privacy" className="hover:text-yellow-400 transition-colors duration-200">
                   Privacy Policy
                 </Link>
-                <Link href="/terms" className="hover:text-metallic-gold-400 transition-colors duration-200">
+                <Link href="/terms" className="hover:text-yellow-400 transition-colors duration-200">
                   Terms of Service
                 </Link>
-                <Link href="/cookies" className="hover:text-metallic-gold-400 transition-colors duration-200">
-                  Cookie Policy
+                <Link href="/returns" className="hover:text-yellow-400 transition-colors duration-200">
+                  Returns Policy
                 </Link>
               </div>
             </div>
 
             {/* Payment Methods */}
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-metallic-platinum-400">We accept:</span>
+              <span className="text-sm text-gray-400">Secure payments:</span>
               <div className="flex space-x-2">
-                {['Visa', 'Mastercard', 'AmEx', 'PayPal'].map((method) => (
+                {paymentMethods.map((method) => (
                   <div
-                    key={method}
-                    className="w-8 h-6 bg-metallic-platinum-200 rounded text-xs flex items-center justify-center text-metallic-charcoal-800 font-medium"
+                    key={method.name}
+                    className="w-10 h-6 bg-white rounded text-xs flex items-center justify-center text-gray-800 font-bold border"
+                    title={`Pay with ${method.name}`}
                   >
-                    {method.slice(0, 2)}
+                    {method.icon}
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+          
+          {/* Additional Info */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-500">
+              All major credit cards and digital wallets accepted • Secure SSL encryption • Shopify Payments
+            </p>
           </div>
         </div>
       </div>

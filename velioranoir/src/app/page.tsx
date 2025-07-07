@@ -1,4 +1,4 @@
-// src/app/page.tsx - UPDATED WITH WISHLIST
+// src/app/page.tsx - FIXED WISHLIST FUNCTIONALITY
 'use client';
 
 import Image from 'next/image';
@@ -15,9 +15,8 @@ import SearchModal from '../components/ui/SearchModal';
 import NewsletterSignup from '../components/ui/NewsletterSignup';
 import Footer from '../components/layout/Footer';
 import { analytics } from '../lib/analytics';
-import AnalyticsTest from '../components/debug/AnalyticsTest';
 
-// Enhanced Product Card with Cart Integration and Links - WITH ANALYTICS & WISHLIST
+// Enhanced Product Card with Cart Integration and Links - WITH FIXED WISHLIST
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
@@ -38,8 +37,10 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
     if (isMounted) {
       if (isInWishlist(product.id)) {
         removeFromWishlist(product.id);
+        console.log('Removed from wishlist:', product.title);
       } else {
         addToWishlist(product);
+        console.log('Added to wishlist:', product.title);
       }
     }
   };
@@ -97,18 +98,19 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
         
-        {/* Wishlist Button */}
+        {/* FIXED Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
-          className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+          className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
             isMounted && isInWishlist(product.id)
-              ? 'bg-red-500 text-white' 
-              : 'bg-white/90 hover:bg-white text-gray-700 hover:text-red-500'
+              ? 'bg-red-500 text-white hover:bg-red-600' 
+              : 'bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 border border-gray-200'
           }`}
           data-luxury-action="wishlist_toggle"
+          title={isMounted && isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <svg className="w-4 h-4" fill={isMounted && isInWishlist(product.id) ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <svg className="w-4 h-4" fill={isMounted && isInWishlist(product.id) ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
         
@@ -394,9 +396,6 @@ export default function Home() {
 
       {/* Cart Drawer */}
       <CartDrawer />
-
-      {/* Temporary analytics testing
-      <AnalyticsTest /> */}
     </>
   );
 }
