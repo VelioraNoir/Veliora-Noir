@@ -1,4 +1,4 @@
-// src/app/about/page.tsx - REPLACE ENTIRE FILE
+// src/app/about/page.tsx - FIXED
 'use client';
 
 import Image from 'next/image';
@@ -69,14 +69,14 @@ export default function About() {
                   jewelry pieces that embody sophistication without compromise.
                 </p>
                 <p>
-                  Our name reflects our mission: "Veliora" - to unveil beauty, and "Noir" - 
+                  {`Our name reflects our mission: "Veliora" - to unveil beauty, and "Noir" - 
                   the timeless elegance of classic design. Together, they represent our commitment 
-                  to revealing the extraordinary in every piece we select.
+                  to revealing the extraordinary in every piece we select.`}
                 </p>
                 <p>
-                  We believe that luxury isn't about exclusivity—it's about excellence. 
+                  {`We believe that luxury isn't about exclusivity—it's about excellence. 
                   Every piece in our collection has been thoughtfully chosen to meet our 
-                  exacting standards for design, quality, and enduring appeal.
+                  exacting standards for design, quality, and enduring appeal.`}
                 </p>
               </div>
             </div>
@@ -178,13 +178,13 @@ export default function About() {
               </h2>
               <div className="space-y-6 text-gray-600 leading-relaxed">
                 <p>
-                  From the moment you discover our collection to the day your piece arrives, 
-                  we've designed every interaction to reflect the luxury you deserve.
+                  {`From the moment you discover our collection to the day your piece arrives, 
+                  we've designed every interaction to reflect the luxury you deserve.`}
                 </p>
                 <p>
                   Our innovative 3D viewer lets you explore each piece in stunning detail, 
                   while our customer service team is always ready to help you find exactly 
-                  what you're looking for.
+                  {` what you're looking for.`}
                 </p>
                 
                 <div className="space-y-4 mt-8">
@@ -244,17 +244,17 @@ export default function About() {
             
             <div className="space-y-6 text-gray-600 leading-relaxed max-w-2xl mx-auto">
               <p className="text-lg italic">
-                "I founded Veliora Noir because I believe everyone deserves to feel confident 
-                and beautiful in jewelry that reflects their personal style."
+                {`"I founded Veliora Noir because I believe everyone deserves to feel confident 
+                and beautiful in jewelry that reflects their personal style."`}
               </p>
               <p>
-                Our mission goes beyond simply offering beautiful pieces. We're here to help you 
+                {`Our mission goes beyond simply offering beautiful pieces. We're here to help you 
                 discover jewelry that tells your story, celebrates your moments, and makes you 
-                feel extraordinary every day.
+                feel extraordinary every day.`}
               </p>
               <p>
-                Thank you for being part of our journey. I can't wait to see how our pieces 
-                become part of yours.
+                {`Thank you for being part of our journey. I can't wait to see how our pieces 
+                become part of yours.`}
               </p>
             </div>
             

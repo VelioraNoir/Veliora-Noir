@@ -1,14 +1,20 @@
-// src/hooks/usePerformanceMonitoring.ts - FIXED VERSION
 'use client';
 
 import { useEffect } from 'react';
 
+declare global {
+  interface LayoutShift extends PerformanceEntry {
+    value: number;
+    hadRecentInput: boolean;
+  }
+}
+
 interface PerformanceMetrics {
-  fcp: number; // First Contentful Paint
-  lcp: number; // Largest Contentful Paint
-  fid: number; // First Input Delay
-  cls: number; // Cumulative Layout Shift
-  ttfb: number; // Time to First Byte
+  fcp?: number; // First Contentful Paint
+  lcp?: number; // Largest Contentful Paint
+  fid?: number; // First Input Delay
+  cls?: number; // Cumulative Layout Shift
+  ttfb?: number; // Time to First Byte
 }
 
 export function usePerformanceMonitoring() {
@@ -17,123 +23,123 @@ export function usePerformanceMonitoring() {
       return;
     }
 
-    const metrics: Partial<PerformanceMetrics> = {};
+    const metrics: PerformanceMetrics = {};
 
     // Observe Core Web Vitals
     const observeWebVitals = () => {
       // Largest Contentful Paint
-      const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
+      const lcpObserver = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries() as PerformanceEntry[];
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry;
         metrics.lcp = lastEntry.startTime;
-        
-        // Report if LCP is poor (>2.5s)
-        if (metrics.lcp && metrics.lcp > 2500) {
-          console.warn('🐌 Poor LCP detected:', metrics.lcp + 'ms');
+
+        if (metrics.lcp > 2500) {
+          console.warn('🐌 Poor LCP detected:', `${metrics.lcp}ms`);
         }
       });
 
       try {
-        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (e) {
-        // Fallback for browsers that don't support LCP
+        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+      } catch {
+        // LCP not supported
       }
 
       // First Input Delay
-      const fidObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry: any) => {
+      const fidObserver = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries() as PerformanceEventTiming[];
+        entries.forEach((entry) => {
           metrics.fid = entry.processingStart - entry.startTime;
-          
-          // Report if FID is poor (>100ms)
-          if (metrics.fid && metrics.fid > 100) {
-            console.warn('🐌 Poor FID detected:', metrics.fid + 'ms');
+
+          if (metrics.fid > 100) {
+            console.warn('🐌 Poor FID detected:', `${metrics.fid}ms`);
           }
         });
       });
 
       try {
-        fidObserver.observe({ entryTypes: ['first-input'] });
-      } catch (e) {
-        // Fallback for browsers that don't support FID
+        fidObserver.observe({ type: 'first-input', buffered: true });
+      } catch {
+        // FID not supported
       }
 
       // Cumulative Layout Shift
-      const clsObserver = new PerformanceObserver((list) => {
+      const clsObserver = new PerformanceObserver((entryList) => {
         let clsValue = 0;
-        const entries = list.getEntries();
-        
-        entries.forEach((entry: any) => {
+        const entries = entryList.getEntries() as LayoutShift[];
+
+        entries.forEach((entry) => {
           if (!entry.hadRecentInput) {
             clsValue += entry.value;
           }
         });
-        
+
         metrics.cls = clsValue;
-        
-        // Report if CLS is poor (>0.1)
-        if (metrics.cls && metrics.cls > 0.1) {
+
+        if (metrics.cls > 0.1) {
           console.warn('🐌 Poor CLS detected:', metrics.cls);
         }
       });
 
       try {
-        clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (e) {
-        // Fallback for browsers that don't support CLS
+        clsObserver.observe({ type: 'layout-shift', buffered: true });
+      } catch {
+        // CLS not supported
       }
     };
 
     // Monitor resource loading times
     const observeResourceTiming = () => {
-      const resourceObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        
-        entries.forEach((entry: any) => {
-          // Flag slow resources (>3s)
+      const resourceObserver = new PerformanceObserver((entryList) => {
+        const entries = entryList.getEntries() as PerformanceResourceTiming[];
+
+        entries.forEach((entry) => {
           if (entry.duration > 3000) {
-            console.warn('🐌 Slow resource detected:', entry.name, entry.duration + 'ms');
+            console.warn('🐌 Slow resource detected:', entry.name, `${entry.duration}ms`);
           }
-          
-          // Flag large resources (>1MB)
+
           if (entry.transferSize > 1024 * 1024) {
-            console.warn('📦 Large resource detected:', entry.name, (entry.transferSize / 1024 / 1024).toFixed(2) + 'MB');
+            console.warn(
+              '📦 Large resource detected:',
+              entry.name,
+              `${(entry.transferSize / 1024 / 1024).toFixed(2)}MB`
+            );
           }
         });
       });
 
       try {
-        resourceObserver.observe({ entryTypes: ['resource'] });
-      } catch (e) {
-        // Fallback
+        resourceObserver.observe({ type: 'resource', buffered: true });
+      } catch {
+        // Resource timing not supported
       }
     };
 
-    // Start monitoring
     observeWebVitals();
     observeResourceTiming();
 
     // Report metrics after page load
-    window.addEventListener('load', () => {
+    const handleLoad = () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as any;
-        if (navigation) {
-          metrics.ttfb = navigation.responseStart - navigation.requestStart;
-          
-          // Log performance summary
+        const navEntries = performance.getEntriesByType('navigation');
+        const navEntry = navEntries[0] as PerformanceNavigationTiming | undefined;
+
+        if (navEntry) {
+          metrics.ttfb = navEntry.responseStart - navEntry.requestStart;
+
           console.log('📊 Performance Metrics:', {
-            'TTFB': (metrics.ttfb || 0) + 'ms',
-            'LCP': (metrics.lcp || 0) + 'ms',
-            'FID': (metrics.fid || 0) + 'ms',
-            'CLS': metrics.cls || 0
+            TTFB: `${metrics.ttfb}ms`,
+            LCP: `${metrics.lcp}ms`,
+            FID: `${metrics.fid}ms`,
+            CLS: metrics.cls,
           });
         }
       }, 1000);
-    });
+    };
 
-    // Cleanup
+    window.addEventListener('load', handleLoad, { once: true });
+
     return () => {
-      // Performance observers are automatically cleaned up
+      window.removeEventListener('load', handleLoad);
     };
   }, []);
 }

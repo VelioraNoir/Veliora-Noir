@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '../lib/shopify';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   product: Product;
   variantId: string;

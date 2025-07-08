@@ -135,7 +135,7 @@ export default function NewsletterSignup({
             <h4 className="font-medium text-green-900 mb-2">Welcome to Veliora Noir!</h4>
             <p className="text-green-700 text-sm">{message}</p>
             <div className="mt-4 space-y-2 text-xs text-green-600">
-              <p>✨ You'll receive exclusive presale access</p>
+              <p>✨ You&apos;ll receive exclusive presale access</p>
               <p>🚀 Be first to know about our July 10th launch</p>
               <p>💎 Special member-only offers and content</p>
             </div>

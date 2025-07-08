@@ -16,7 +16,7 @@ interface ProductModelViewerProps {
 export default function ProductModelViewer({ 
   className = '', 
   modelPath = '/models/ring.glb', // Put your 3D model files in public/models/
-  initialMaterial = 'Silver'
+  
 }: ProductModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -272,9 +272,8 @@ export default function ProductModelViewer({
     window.addEventListener('mouseup', handleMouseUp);
 
     // Animation loop
-    let time = 0;
+    
     const animate = () => {
-      time += 0.01;
       
       if (!modelRef.current) return;
       
@@ -336,7 +335,7 @@ export default function ProductModelViewer({
       
       renderer.dispose();
     };
-  }, [showParticles, modelPath]);
+  }, []);
 
   // Update material when changed
   useEffect(() => {

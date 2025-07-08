@@ -88,19 +88,19 @@ export default function PerformanceOptimizations() {
     };
 
     // Service Worker for caching (optional)
-    const registerServiceWorker = () => {
-      if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
-    };
+    // const registerServiceWorker = () => {
+    //   if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    //     window.addEventListener('load', () => {
+    //       navigator.serviceWorker.register('/sw.js')
+    //         .then(registration => {
+    //           console.log('SW registered: ', registration);
+    //         })
+    //         .catch(registrationError => {
+    //           console.log('SW registration failed: ', registrationError);
+    //         });
+    //     });
+    //   }
+    // };
 
     // Execute optimizations
     preloadCriticalResources();
@@ -126,7 +126,7 @@ export const generateBreadcrumbs = (pathname: string) => {
   const breadcrumbs = [{ name: 'Home', url: '/' }];
   
   let currentPath = '';
-  paths.forEach((path, index) => {
+  paths.forEach((path) => {
     currentPath += `/${path}`;
     const name = path.charAt(0).toUpperCase() + path.slice(1);
     breadcrumbs.push({

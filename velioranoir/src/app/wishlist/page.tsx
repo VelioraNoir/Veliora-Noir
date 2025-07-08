@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useWishlistStore } from '../../store/wishlistStore';
 import { useCartStore } from '../../store/cartStore';
 import { analytics } from '../../lib/analytics';
+import type { Product } from '../../lib/shopify'; 
 
 export default function WishlistPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -28,7 +29,7 @@ export default function WishlistPage() {
     removeItem(productId);
   };
 
-  const handleAddToCart = (product: any, productId: string) => {
+  const handleAddToCart = (product: Product, productId: string) => {
     const mainVariant = product.variants[0];
     if (mainVariant?.available) {
       addToCart(product, mainVariant.id);

@@ -1,6 +1,14 @@
 // src/lib/shopifyTest.ts - Simple API Test
 import Client from 'shopify-buy';
 
+// somewhere at the top of your file (or in a central `global.d.ts`)
+declare global {
+  interface Window {
+    testShopify: typeof testShopifyConnection;
+  }
+}
+
+
 export async function testShopifyConnection() {
   const domain = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
   const token = process.env.NEXT_PUBLIC_STOREFRONT_TOKEN;
@@ -46,5 +54,5 @@ export async function testShopifyConnection() {
 
 // Test function you can call in browser console
 if (typeof window !== 'undefined') {
-  (window as any).testShopify = testShopifyConnection;
+  window.testShopify = testShopifyConnection;
 }

@@ -1,10 +1,12 @@
-// src/app/layout.tsx - REPLACE ENTIRE FILE
+// src/app/layout.tsx - FIXED WITH CART DRAWER ON ALL PAGES
 import type { Metadata } from "next";
 import { Inter, Playfair_Display_SC } from 'next/font/google';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import CartDrawer from '../components/cart/CartDrawer';
 import Script from 'next/script';
 import "./globals.css";
+import Image from 'next/image';
 
 // Configure fonts with Next.js optimization
 const inter = Inter({
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
   keywords: "luxury accessories, metallic jewelry, premium design, sophisticated style, handcrafted accessories, 3D jewelry viewer, luxury rings, necklaces, bracelets, earrings",
   authors: [{ name: "Veliora Noir" }],
   viewport: "width=device-width, initial-scale=1",
-  robots: "index, follow",
+  robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
   openGraph: {
     title: "Veliora Noir - Luxury Metallic Accessories",
     description: "Discover our exquisite collection of premium metallic accessories crafted with unparalleled attention to detail. Experience luxury jewelry in stunning 3D.",
@@ -204,11 +206,12 @@ export default function RootLayout({
         {/* Facebook Pixel - noscript fallback */}
         {FACEBOOK_PIXEL_ID && (
           <noscript>
-            <img
-              height="1"
-              width="1"
+            <Image
+              height={1}
+              width={1}
               style={{ display: 'none' }}
               src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
+              alt=""
             />
           </noscript>
         )}
@@ -226,6 +229,9 @@ export default function RootLayout({
         
         {/* Footer */}
         <Footer />
+        
+        {/* CART DRAWER - NOW AVAILABLE ON ALL PAGES */}
+        <CartDrawer />
         
         {/* Subtle shine effect that moves across the page */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">

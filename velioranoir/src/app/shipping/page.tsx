@@ -214,7 +214,7 @@ export default function ShippingInfo() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="font-semibold text-black mb-4">What's Included:</h3>
+              <h3 className="font-semibold text-black mb-4">What&apos;s Included:</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-xl">🎁</span>
@@ -267,7 +267,7 @@ export default function ShippingInfo() {
                 Can I change my shipping address after ordering?
               </h3>
               <p className="text-gray-600 text-sm">
-                Yes, if your order hasn't shipped yet. Contact us immediately at help.velioranoir@gmail.com with your order number.
+                Yes, if your order hasn&apos;t shipped yet. Contact us immediately at help.velioranoir@gmail.com with your order number.
               </p>
             </div>
             
@@ -285,7 +285,7 @@ export default function ShippingInfo() {
                 What if my package is lost or damaged?
               </h3>
               <p className="text-gray-600 text-sm">
-                All shipments are fully insured. Contact us immediately if your package arrives damaged or doesn't arrive within the expected timeframe.
+                All shipments are fully insured. Contact us immediately if your package arrives damaged or doesn&apos;t arrive within the expected timeframe.
               </p>
             </div>
             
@@ -294,7 +294,7 @@ export default function ShippingInfo() {
                 Can I schedule a specific delivery date?
               </h3>
               <p className="text-gray-600 text-sm">
-                While we can't guarantee specific delivery dates, we can accommodate special requests. Contact us for assistance with time-sensitive deliveries.
+                While we can&apos;t guarantee specific delivery dates, we can accommodate special requests. Contact us for assistance with time-sensitive deliveries.
               </p>
             </div>
           </div>

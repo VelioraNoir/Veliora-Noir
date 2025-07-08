@@ -2,13 +2,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAllProducts } from '../../lib/shopify';
+import { getAllProducts, Product } from '../../lib/shopify';
 
 export default function ShopifyDebug() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rawData, setRawData] = useState<any>(null);
+  const [rawData, setRawData] = useState<Product[] | null>(null);
 
   const testConnection = async () => {
     setLoading(true);

@@ -1,5 +1,16 @@
 // src/lib/seo.ts - NEW FILE
 // SEO utilities and configuration for Veliora Noir
+import type { Product } from './shopify';
+
+// Add this alongside your imports or at the top of the file
+interface MetaTag {
+  name?: string;
+  content?: string;
+  property?: string;
+  rel?: 'canonical';
+  href?: string;
+}
+
 
 export interface SEOConfig {
   title: string;
@@ -131,14 +142,14 @@ export const pageSEO = {
 };
 
 // Generate JSON-LD structured data for products
-export const generateProductJsonLd = (product: any) => {
+export const generateProductJsonLd = (product: Product) => {
   const variant = product.variants[0];
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.title,
     "description": product.description,
-    "image": product.images.map((img: any) => img.src),
+    "image": product.images.map(img => img.src),
     "brand": {
       "@type": "Brand", 
       "name": "Veliora Noir"
@@ -178,7 +189,9 @@ export const generateBreadcrumbJsonLd = (breadcrumbs: Array<{name: string, url: 
 
 // SEO utility functions
 export const generateMetaTags = (config: SEOConfig) => {
-  const tags = [
+    const tags: MetaTag[] = [
+    { name: "description", content: config.description },
+    // … other tags
     { name: "description", content: config.description },
     { name: "keywords", content: config.keywords?.join(", ") || "" },
     { property: "og:title", content: config.title },
@@ -190,9 +203,10 @@ export const generateMetaTags = (config: SEOConfig) => {
     { name: "twitter:description", content: config.description },
     { name: "twitter:image", content: config.ogImage || defaultSEO.ogImage }
   ];
+ 
   
   if (config.canonical) {
-    tags.push({ rel: "canonical", href: config.canonical } as any);
+    tags.push({ rel: "canonical", href: config.canonical });
   }
   
   return tags;
