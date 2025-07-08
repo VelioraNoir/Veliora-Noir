@@ -1,19 +1,44 @@
-// src/lib/shopifyTest.ts - Simple API Test
-import Client from 'shopify-buy';
+// src/lib/shopifyTest.ts - Updated for Storefront API Client
+import { client } from './shopify';
 
-// somewhere at the top of your file (or in a central `global.d.ts`)
 declare global {
   interface Window {
     testShopify: typeof testShopifyConnection;
   }
 }
 
+const SHOP_QUERY = `
+  query {
+    shop {
+      name
+      description
+      primaryDomain {
+        url
+      }
+    }
+  }
+`;
+
+const TEST_CART_MUTATION = `
+  mutation {
+    cartCreate(input: {}) {
+      cart {
+        id
+        checkoutUrl
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
 
 export async function testShopifyConnection() {
   const domain = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
   const token = process.env.NEXT_PUBLIC_STOREFRONT_TOKEN;
   
-  console.log('🔍 Testing Shopify connection...');
+  console.log('🔍 Testing Shopify Storefront API Client connection...');
   console.log('Domain:', domain);
   console.log('Token exists:', !!token);
 
@@ -21,28 +46,61 @@ export async function testShopifyConnection() {
     throw new Error('Missing Shopify credentials');
   }
 
+  if (!client) {
+    throw new Error('Shopify client not initialized');
+  }
+
   try {
-    const client = Client.buildClient({
-      domain,
-      storefrontAccessToken: token,
-    });
-
     // Test basic shop info
-    const shop = await client.shop.fetchInfo();
-    console.log('✅ Shop info:', shop);
+    const { data: shopData, errors: shopErrors } = await client.request(SHOP_QUERY);
+    
+    if (shopErrors) {
+      console.error('❌ Shop query errors:', shopErrors);
+      throw new Error(`Shop query failed: ${JSON.stringify(shopErrors)}`);
+    }
 
-    // Test creating an empty checkout (to see exact error)
+    console.log('✅ Shop info:', shopData.shop);
+
+    // Test creating an empty cart
     try {
-      const checkout = await client.checkout.create();
-      console.log('✅ Empty checkout created successfully:', checkout.id);
-      return { success: true, method: 'legacy_checkout', shop };
-    } catch (checkoutError) {
-      console.log('❌ Legacy checkout failed:', checkoutError);
+      const { data: cartData, errors: cartErrors } = await client.request(TEST_CART_MUTATION);
+      
+      if (cartErrors) {
+        console.log('❌ Cart creation errors:', cartErrors);
+        return { 
+          success: false, 
+          method: 'direct_url', 
+          shop: shopData.shop,
+          error: cartErrors,
+          fallbackAvailable: true 
+        };
+      }
+
+      if (cartData.cartCreate.userErrors.length > 0) {
+        console.log('❌ Cart creation user errors:', cartData.cartCreate.userErrors);
+        return { 
+          success: false, 
+          method: 'direct_url', 
+          shop: shopData.shop,
+          error: cartData.cartCreate.userErrors,
+          fallbackAvailable: true 
+        };
+      }
+
+      console.log('✅ Empty cart created successfully:', cartData.cartCreate.cart.id);
+      return { 
+        success: true, 
+        method: 'storefront_api_client', 
+        shop: shopData.shop,
+        cart: cartData.cartCreate.cart
+      };
+    } catch (cartError) {
+      console.log('❌ Cart creation failed:', cartError);
       return { 
         success: false, 
         method: 'direct_url', 
-        shop,
-        error: checkoutError,
+        shop: shopData.shop,
+        error: cartError,
         fallbackAvailable: true 
       };
     }
