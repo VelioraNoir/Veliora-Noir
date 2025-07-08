@@ -1,19 +1,16 @@
-// src/app/page.tsx - FIXED WISHLIST FUNCTIONALITY
+// src/app/page.tsx - UPDATED WITHOUT CART DRAWER
 'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAllProductsWithFallback, Product } from '../lib/shopify';
 import { ProductCardSkeleton, ErrorMessage } from '../components/ui/LoadingComponents';
 import Advanced3DViewer from '../components/3d/Advanced3DScene';
-import CartDrawer from '../components/cart/CartDrawer';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import PresaleBanner from '../components/ui/PresaleBanner';
-import SearchModal from '../components/ui/SearchModal';
 import NewsletterSignup from '../components/ui/NewsletterSignup';
-import Footer from '../components/layout/Footer';
 import { analytics } from '../lib/analytics';
 
 // Enhanced Product Card with Cart Integration and Links - WITH FIXED WISHLIST
@@ -393,9 +390,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      {/* Cart Drawer */}
-      <CartDrawer />
     </>
   );
 }

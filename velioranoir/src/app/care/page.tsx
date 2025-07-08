@@ -317,7 +317,7 @@ export default function CareInstructions() {
             
             <div>
               <h3 className="font-semibold text-black mb-2">
-                What's the best way to store my accessories when traveling?
+                What&apos;s the best way to store my accessories when traveling?
               </h3>
               <p className="text-gray-600 text-sm">
                 Use a travel jewelry case with individual compartments. Wrap delicate pieces in 
@@ -331,7 +331,7 @@ export default function CareInstructions() {
               </h3>
               <p className="text-gray-600 text-sm">
                 Regular conditioning and gentle use will develop a beautiful patina. Avoid 
-                over-cleaning and let natural oils from handling enhance the leather's character.
+                over-cleaning and let natural oils from handling enhance the leather&apos;s character.
               </p>
             </div>
 

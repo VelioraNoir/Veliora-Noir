@@ -203,7 +203,7 @@ export default function Bracelets() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {products.map((product, index) => (
+              {products.map((product) => (
                 <div key={product.id} className="product-card rounded-2xl overflow-hidden group h-full flex flex-col">
                   <Link 
                     href={`/products/${encodeURIComponent(product.id)}`}
@@ -279,15 +279,15 @@ export default function Bracelets() {
                     <div className="space-y-3 text-sm text-gray-600">
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span><strong>Small:</strong> 6.5" - 7" wrist</span>
+                        <span><strong>Small:</strong> 6.5&quot; - 7&quot; wrist</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span><strong>Medium:</strong> 7" - 7.5" wrist</span>
+                        <span><strong>Medium:</strong> 7&quot; - 7.5&quot; wrist</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span><strong>Large:</strong> 7.5" - 8" wrist</span>
+                        <span><strong>Large:</strong> 7.5&quot; - 8&quot; wrist</span>
                       </div>
                     </div>
                     <div className="mt-6">
@@ -411,7 +411,7 @@ export default function Bracelets() {
         </div>
       </section>
 
-      {/* Trust Signals */}
+      {/* Trust Signals
       <section className="px-8 pb-20">
         <div className="max-w-4xl mx-auto">
           <div className="glass-card p-8">
@@ -448,7 +448,7 @@ export default function Bracelets() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }

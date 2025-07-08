@@ -1,9 +1,10 @@
-// src/components/3d/Advanced3DScene.tsx - REPLACE ENTIRE FILE
+// src/components/3d/Advanced3DScene.tsx - ENHANCED REALISTIC RING MODEL
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { analytics } from '../../lib/analytics';
+
 
 interface Advanced3DViewerProps {
   className?: string;
@@ -14,15 +15,12 @@ interface Advanced3DViewerProps {
 
 export default function Advanced3DViewer({ 
   className = '', 
-  enablePostProcessing = true,
-  initialProductType = 'Ring',
-  initialMaterial = 'Silver'
 }: Advanced3DViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const ringRef = useRef<THREE.Mesh | null>(null);
+  const ringGroupRef = useRef<THREE.Group | null>(null);
   const particlesRef = useRef<THREE.Points | null>(null);
   const animationIdRef = useRef<number | null>(null);
   
@@ -65,9 +63,10 @@ export default function Advanced3DViewer({
     scene.background = new THREE.Color(0xf8f9fa);
     sceneRef.current = scene;
 
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 5);
+    // Camera setup - adjusted for better ring viewing
+    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+    camera.position.set(0, 2, 4);
+    camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
 
     // Renderer setup
@@ -86,11 +85,11 @@ export default function Advanced3DViewer({
     container.appendChild(renderer.domElement);
 
     // Enhanced lighting for luxury feel
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
     // Key light (main)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
     keyLight.position.set(5, 5, 5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
@@ -98,71 +97,179 @@ export default function Advanced3DViewer({
     scene.add(keyLight);
 
     // Fill light (softer)
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
     fillLight.position.set(-3, 2, 4);
     scene.add(fillLight);
 
     // Rim light for edge definition
-    const rimLight = new THREE.DirectionalLight(0xffd700, 0.6);
-    rimLight.position.set(0, 0, -5);
+    const rimLight = new THREE.DirectionalLight(0xffd700, 0.8);
+    rimLight.position.set(0, -2, -5);
     scene.add(rimLight);
 
-    // Environment map for reflections (creates luxury studio look)
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const envGeometry = new THREE.SphereGeometry(50, 32, 16);
-    const envMaterial = new THREE.MeshBasicMaterial({
-      color: 0xf0f0f0,
-      side: THREE.BackSide
-    });
-    const envSphere = new THREE.Mesh(envGeometry, envMaterial);
-    scene.add(envSphere);
+    // Point lights for sparkle
+    const pointLight1 = new THREE.PointLight(0xffffff, 0.5);
+    pointLight1.position.set(2, 2, 2);
+    scene.add(pointLight1);
 
-    // Ring geometry
-    const ringGeometry = new THREE.TorusGeometry(1, 0.3, 16, 100);
-    
-    // Initial material with enhanced properties
+    const pointLight2 = new THREE.PointLight(0xffffff, 0.5);
+    pointLight2.position.set(-2, 2, -2);
+    scene.add(pointLight2);
+
+    // CREATE REALISTIC RING GROUP
+    const ringGroup = new THREE.Group();
+    ringGroupRef.current = ringGroup;
+
+    // Get current material
     const currentMat = materials.find(m => m.name === material) || materials[0];
-    const ringMaterial = new THREE.MeshStandardMaterial({
+
+    // 1. CREATE RING BAND (more realistic proportions)
+    // Using a custom geometry for a more realistic band
+    const bandGeometry = new THREE.TorusGeometry(
+      0.8,    // radius (smaller for more realistic size)
+      0.08,   // tube radius (thinner band)
+      8,      // radial segments (less for performance)
+      64      // tubular segments (more for smoothness)
+    );
+    
+    const bandMaterial = new THREE.MeshStandardMaterial({
       color: currentMat.color,
       metalness: currentMat.metalness,
       roughness: currentMat.roughness,
-      envMapIntensity: 1.5, // Enhanced reflections
+      envMapIntensity: 1.5,
     });
 
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.castShadow = true;
-    ring.receiveShadow = true;
-    scene.add(ring);
-    ringRef.current = ring;
+    const band = new THREE.Mesh(bandGeometry, bandMaterial);
+    band.castShadow = true;
+    band.receiveShadow = true;
+    ringGroup.add(band);
 
-    // Enhanced gems with inner glow
-    const gemGeometry = new THREE.SphereGeometry(0.08, 16, 16);
-    const gemMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff6b9d,
-      transparent: true,
-      opacity: 0.9,
+    // 2. CREATE GEM SETTING (the mount for the gem)
+    const settingGeometry = new THREE.ConeGeometry(0.15, 0.15, 6);
+    const settingMaterial = new THREE.MeshStandardMaterial({
+      color: currentMat.color,
+      metalness: currentMat.metalness,
+      roughness: currentMat.roughness,
+    });
+    
+    const setting = new THREE.Mesh(settingGeometry, settingMaterial);
+    setting.position.y = 0.8; // Position on top of ring
+    setting.rotation.y = Math.PI / 6; // Slight rotation for visual interest
+    ringGroup.add(setting);
+
+    // 3. CREATE MAIN GEM (larger, more prominent)
+    const gemRadius = 0.12;
+    const gemGeometry = new THREE.OctahedronGeometry(gemRadius, 2);
+    
+    // Diamond-like material
+    const gemMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
       metalness: 0,
       roughness: 0,
-      emissive: 0xff6b9d,
-      emissiveIntensity: 0.1,
+      transmission: 0.95,
+      thickness: 0.5,
+      envMapIntensity: 3,
+      clearcoat: 1,
+      clearcoatRoughness: 0,
+      ior: 2.4, // Diamond IOR
+      reflectivity: 1,
+      transparent: true,
+      opacity: 0.9,
     });
 
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const gem = new THREE.Mesh(gemGeometry, gemMaterial);
-      gem.position.set(Math.cos(angle) * 1.0, Math.sin(angle) * 1.0, 0);
-      ring.add(gem);
+    const mainGem = new THREE.Mesh(gemGeometry, gemMaterial);
+    mainGem.position.y = 0.85; // Position above setting
+    mainGem.rotation.x = Math.PI / 4;
+    mainGem.rotation.z = Math.PI / 4;
+    mainGem.castShadow = true;
+    ringGroup.add(mainGem);
+
+    // 4. CREATE PRONGS (to hold the gem)
+    const prongGeometry = new THREE.CylinderGeometry(0.01, 0.02, 0.2, 4);
+    const prongMaterial = new THREE.MeshStandardMaterial({
+      color: currentMat.color,
+      metalness: currentMat.metalness,
+      roughness: currentMat.roughness,
+    });
+
+    // Create 4 prongs
+    for (let i = 0; i < 4; i++) {
+      const prong = new THREE.Mesh(prongGeometry, prongMaterial);
+      const angle = (i / 4) * Math.PI * 2;
+      prong.position.x = Math.cos(angle) * 0.1;
+      prong.position.z = Math.sin(angle) * 0.1;
+      prong.position.y = 0.75;
+      prong.rotation.z = -angle;
+      prong.rotation.x = 0.3;
+      ringGroup.add(prong);
     }
 
+    // 5. ADD SMALL ACCENT GEMS on the band
+    const accentGemGeometry = new THREE.OctahedronGeometry(0.03, 1);
+    const accentGemMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xffc0cb, // Pink accent gems
+      metalness: 0,
+      roughness: 0,
+      transmission: 0.9,
+      thickness: 0.3,
+      envMapIntensity: 2,
+      clearcoat: 1,
+      clearcoatRoughness: 0,
+      transparent: true,
+      opacity: 0.85,
+    });
+
+    // Add accent gems around the band
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const accentGem = new THREE.Mesh(accentGemGeometry, accentGemMaterial);
+      
+      // Position on the ring circumference
+      const ringRadius = 0.8;
+      accentGem.position.x = Math.cos(angle) * ringRadius;
+      accentGem.position.z = Math.sin(angle) * ringRadius;
+      accentGem.position.y = 0;
+      
+      // Random rotation for sparkle
+      accentGem.rotation.x = Math.random() * Math.PI;
+      accentGem.rotation.y = Math.random() * Math.PI;
+      
+      // Skip positions where main gem setting is
+      if (i !== 0 && i !== 3) {
+        ringGroup.add(accentGem);
+      }
+    }
+
+    // 6. ADD BAND DETAILS (engraving effect)
+    const detailGeometry = new THREE.TorusGeometry(0.8, 0.005, 4, 100);
+    const detailMaterial = new THREE.MeshStandardMaterial({
+      color: currentMat.color,
+      metalness: currentMat.metalness * 0.8,
+      roughness: currentMat.roughness * 2,
+    });
+
+    const bandDetail1 = new THREE.Mesh(detailGeometry, detailMaterial);
+    bandDetail1.position.y = 0.05;
+    ringGroup.add(bandDetail1);
+
+    const bandDetail2 = new THREE.Mesh(detailGeometry, detailMaterial);
+    bandDetail2.position.y = -0.05;
+    ringGroup.add(bandDetail2);
+
+    // Add the complete ring to the scene
+    scene.add(ringGroup);
+
+    // Adjust ring position and rotation for better initial view
+    ringGroup.rotation.x = -0.3;
+
     // Subtle floating particles (luxury dust)
-    const particleCount = 15; // Keep it minimal for performance
+    const particleCount = 20;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 8;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 8;
+      positions[i * 3] = (Math.random() - 0.5) * 4;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 4;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
       
       velocities[i * 3] = (Math.random() - 0.5) * 0.01;
       velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
@@ -184,8 +291,8 @@ export default function Advanced3DViewer({
     scene.add(particles);
     particlesRef.current = particles;
 
-    // Gentle ring glow effect
-    const glowGeometry = new THREE.TorusGeometry(1.1, 0.35, 16, 100);
+    // Add subtle ring glow
+    const glowGeometry = new THREE.TorusGeometry(0.85, 0.12, 8, 64);
     const glowMaterial = new THREE.MeshBasicMaterial({
       color: currentMat.color,
       transparent: true,
@@ -193,7 +300,7 @@ export default function Advanced3DViewer({
       side: THREE.BackSide,
     });
     const ringGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-    ring.add(ringGlow);
+    ringGroup.add(ringGlow);
 
     // TOUCH AND MOUSE CONTROLS WITH ANALYTICS
     const handleTouchStart = (event: TouchEvent) => {
@@ -201,7 +308,6 @@ export default function Advanced3DViewer({
       const touch = event.touches[0];
       touchRef.current = { x: touch.clientX, y: touch.clientY };
       
-      // Track touch interaction
       analytics.trackEvent('3d_viewer_touch_start', {
         interaction_type: 'touch',
         device_type: 'mobile'
@@ -210,14 +316,14 @@ export default function Advanced3DViewer({
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (!isInteracting || !ring) return;
+      if (!isInteracting || !ringGroup) return;
       
       const touch = event.touches[0];
       const deltaX = touch.clientX - touchRef.current.x;
       const deltaY = touch.clientY - touchRef.current.y;
       
-      ring.rotation.y += deltaX * 0.01;
-      ring.rotation.x += deltaY * 0.01;
+      ringGroup.rotation.y += deltaX * 0.01;
+      ringGroup.rotation.x += deltaY * 0.01;
       
       touchRef.current = { x: touch.clientX, y: touch.clientY };
     };
@@ -225,7 +331,6 @@ export default function Advanced3DViewer({
     const handleTouchEnd = () => {
       setIsInteracting(false);
       
-      // Track touch interaction end
       analytics.trackEvent('3d_viewer_touch_end', {
         total_interactions: totalInteractions + 1,
         engagement_level: 'active'
@@ -236,7 +341,6 @@ export default function Advanced3DViewer({
       setIsInteracting(true);
       mouseRef.current = { x: event.clientX, y: event.clientY };
       
-      // Track mouse interaction
       analytics.trackEvent('3d_viewer_mouse_start', {
         interaction_type: 'mouse',
         device_type: 'desktop'
@@ -245,13 +349,13 @@ export default function Advanced3DViewer({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isInteracting || !ring) return;
+      if (!isInteracting || !ringGroup) return;
       
       const deltaX = event.clientX - mouseRef.current.x;
       const deltaY = event.clientY - mouseRef.current.y;
       
-      ring.rotation.y += deltaX * 0.01;
-      ring.rotation.x += deltaY * 0.01;
+      ringGroup.rotation.y += deltaX * 0.01;
+      ringGroup.rotation.x += deltaY * 0.01;
       
       mouseRef.current = { x: event.clientX, y: event.clientY };
     };
@@ -259,7 +363,6 @@ export default function Advanced3DViewer({
     const handleMouseUp = () => {
       setIsInteracting(false);
       
-      // Track mouse interaction end
       analytics.trackEvent('3d_viewer_mouse_end', {
         total_interactions: totalInteractions + 1,
         engagement_level: 'active'
@@ -278,37 +381,56 @@ export default function Advanced3DViewer({
     const animate = () => {
       time += 0.01;
       
-      if (!ring) return;
+      if (!ringGroup) return;
       
       // Auto rotation when not interacting
       if (!isInteracting) {
-        ring.rotation.y += 0.005;
+        ringGroup.rotation.y += 0.005;
+      }
+
+      // Animate the main gem for sparkle effect
+      // a type‐predicate version so mainGem comes out as a Mesh
+    const mainGem = ringGroup.children.find(
+    (child): child is THREE.Mesh =>
+        child instanceof THREE.Mesh &&
+        child.geometry instanceof THREE.OctahedronGeometry &&
+        child.geometry.parameters.radius > 0.1
+    );
+
+    if (mainGem) {
+    // TS now knows mainGem.geometry is OctahedronGeometry
+    mainGem.rotation.y += 0.02;
+    mainGem.rotation.z += 0.01;
+    }
+
+      if (mainGem) {
+        mainGem.rotation.y += 0.02;
+        mainGem.rotation.z += 0.01;
       }
 
       // Animate particles
-      if (particles && showParticles) {
+      if (particles && showParticles) { 
         const positions = particles.geometry.attributes.position.array as Float32Array;
         for (let i = 0; i < particleCount; i++) {
           positions[i * 3] += velocities[i * 3];
           positions[i * 3 + 1] += velocities[i * 3 + 1];
           positions[i * 3 + 2] += velocities[i * 3 + 2];
           
-          // Boundary check (keep particles in view)
-          if (Math.abs(positions[i * 3]) > 4) velocities[i * 3] *= -1;
-          if (Math.abs(positions[i * 3 + 1]) > 4) velocities[i * 3 + 1] *= -1;
-          if (Math.abs(positions[i * 3 + 2]) > 4) velocities[i * 3 + 2] *= -1;
+          // Boundary check
+          if (Math.abs(positions[i * 3]) > 2) velocities[i * 3] *= -1;
+          if (Math.abs(positions[i * 3 + 1]) > 2) velocities[i * 3 + 1] *= -1;
+          if (Math.abs(positions[i * 3 + 2]) > 2) velocities[i * 3 + 2] *= -1;
         }
         particles.geometry.attributes.position.needsUpdate = true;
-        
-        // Gentle rotation
         particles.rotation.y += 0.001;
       }
 
       // Subtle glow pulsing
-      const glow = ring.children.find(child => 
+      const glow = ringGroup.children.find(child => 
         child instanceof THREE.Mesh && 
         child.material && 
-        (child.material as THREE.Material).transparent
+        (child.material as THREE.Material).transparent &&
+        child.geometry instanceof THREE.TorusGeometry
       ) as THREE.Mesh | undefined;
       
       if (glow && glow.material) {
@@ -336,7 +458,6 @@ export default function Advanced3DViewer({
       camera.updateProjectionMatrix();
       renderer.setSize(newWidth, newHeight);
       
-      // Track resize events for responsive design insights
       analytics.trackEvent('3d_viewer_resize', {
         new_size: `${newWidth}x${newHeight}`,
         device_orientation: newWidth > newHeight ? 'landscape' : 'portrait'
@@ -364,9 +485,7 @@ export default function Advanced3DViewer({
       }
       
       renderer.dispose();
-      pmremGenerator.dispose();
 
-      // Track 3D viewer session end
       const sessionDuration = Date.now() - sessionStartTime;
       analytics.trackEvent('3d_viewer_session_end', {
         session_duration_ms: sessionDuration,
@@ -379,28 +498,35 @@ export default function Advanced3DViewer({
 
   // Update material when changed WITH ANALYTICS
   useEffect(() => {
-    if (!ringRef.current) return;
+    if (!ringGroupRef.current) return;
     
     const currentMat = materials.find(m => m.name === material) || materials[0];
-    const mesh = ringRef.current as THREE.Mesh;
-    const meshMaterial = mesh.material as THREE.MeshStandardMaterial;
+    const ringGroup = ringGroupRef.current;
     
-    meshMaterial.color.setHex(currentMat.color);
-    meshMaterial.metalness = currentMat.metalness;
-    meshMaterial.roughness = currentMat.roughness;
+    // Update all metal parts (band, setting, prongs, details)
+    ringGroup.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const mesh = child as THREE.Mesh;
+        
+        // Check if it's a metal part (not a gem)
+        if (mesh.material instanceof THREE.MeshStandardMaterial && 
+            !(mesh.geometry instanceof THREE.OctahedronGeometry)) {
+          const material = mesh.material as THREE.MeshStandardMaterial;
+          material.color.setHex(currentMat.color);
+          material.metalness = currentMat.metalness;
+          material.roughness = currentMat.roughness;
+          material.needsUpdate = true;
+        }
+        
+        // Update glow color
+        if (mesh.material instanceof THREE.MeshBasicMaterial && 
+            mesh.material.transparent &&
+            mesh.geometry instanceof THREE.TorusGeometry) {
+          (mesh.material as THREE.MeshBasicMaterial).color.setHex(currentMat.color);
+        }
+      }
+    });
 
-    // Update glow color
-    const glow = mesh.children.find(child => 
-      child instanceof THREE.Mesh && 
-      child.material && 
-      (child.material as THREE.Material).transparent
-    ) as THREE.Mesh | undefined;
-    
-    if (glow && glow.material) {
-      (glow.material as THREE.MeshBasicMaterial).color.setHex(currentMat.color);
-    }
-
-    // TRACK MATERIAL CHANGE
     analytics.use3DViewer('demo-ring', true);
     analytics.trackEvent('3d_viewer_material_change', {
       old_material: materials.find(m => m.name !== material)?.name || 'unknown',
@@ -412,13 +538,11 @@ export default function Advanced3DViewer({
     setMaterialChanges(prev => prev + 1);
   }, [material]);
 
-  // Helper function to get material value for analytics
   const getMaterialValue = (materialName: string): number => {
     const values = { Silver: 100, Gold: 300, Platinum: 500, Copper: 50 };
     return values[materialName as keyof typeof values] || 100;
   };
 
-  // Handle particle toggle with analytics
   const handleParticleToggle = () => {
     setShowParticles(!showParticles);
     
@@ -428,7 +552,6 @@ export default function Advanced3DViewer({
     });
   };
 
-  // Handle material selection with analytics
   const handleMaterialChange = (materialName: string) => {
     setMaterial(materialName);
     
@@ -507,14 +630,19 @@ export default function Advanced3DViewer({
         </div>
       </div>
 
+      {/* Beta Disclaimer */}
+      <div className="absolute bottom-4 right-4 bg-white/90 text-gray-600 text-xs p-2 rounded">
+        <p>3D viewer (beta): features may change.</p>
+      </div>
+
       {/* Interaction Stats (Development mode only) */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* {process.env.NODE_ENV === 'development' && (
         <div className="absolute bottom-4 left-4 bg-black/75 text-white text-xs p-2 rounded">
           <div>Interactions: {totalInteractions}</div>
           <div>Material Changes: {materialChanges}</div>
           <div>Session: {Math.round((Date.now() - sessionStartTime) / 1000)}s</div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

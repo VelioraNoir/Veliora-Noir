@@ -101,132 +101,72 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       email_domain: formData.email.split('@')[1] || 'unknown'
     });
 
-    try {
-      // HubSpot Form Submission
-      const hubspotPortalId = process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID;
-      const hubspotFormId = process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID;
+    // …inside handleSubmit…
+try {
+  // Send to our own email endpoint
+  const res = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  });
 
-      if (!hubspotPortalId || !hubspotFormId) {
-        throw new Error('HubSpot configuration missing');
-      }
+  if (!res.ok) throw new Error('Email send failed');
 
-      // Prepare HubSpot form data
-      const hubspotData = new URLSearchParams();
-      hubspotData.append('firstname', formData.name.split(' ')[0]);
-      hubspotData.append('lastname', formData.name.split(' ').slice(1).join(' ') || '');
-      hubspotData.append('email', formData.email);
-      hubspotData.append('subject', formData.subject || `${formData.inquiryType} inquiry`);
-      hubspotData.append('message', formData.message);
-      hubspotData.append('inquiry_type', formData.inquiryType);
-      if (formData.phone) {
-        hubspotData.append('phone', formData.phone);
-      }
-      
-      // Add tracking context
-      hubspotData.append('hs_context', JSON.stringify({
-        hutk: getCookie('hubspotutk'),
-        pageUri: window.location.href,
-        pageName: document.title,
-        source: 'website_contact_form',
-        timestamp: Date.now(),
-        luxury_brand: 'veliora_noir',
-        customer_segment: formData.inquiryType === 'wholesale' ? 'b2b' : 'b2c'
-      }));
+  setStatus('success');
+  analytics.contactFormSubmit(formData.inquiryType);
 
-      const response = await fetch(
-        `https://api.hsforms.com/submissions/v3/integration/submit/${hubspotPortalId}/${hubspotFormId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: hubspotData.toString(),
-        }
-      );
+} catch (error) {
+  console.error('Contact form error:', error);
+  setStatus('error');
+  setErrorMessage(
+    'Something went wrong. Please try again or email us directly at help.velioranoir@gmail.com'
+  );
+  analytics.trackEvent('contact_form_submission_error', {
+    error_message: error instanceof Error ? error.message : 'unknown_error',
+    inquiry_type: formData.inquiryType,
+    email_domain: formData.email.split('@')[1] || 'unknown'
+  });
+}
 
-      if (response.ok) {
-        setStatus('success');
-        
-        // Track successful contact form submission across all platforms
-        analytics.contactFormSubmit(formData.inquiryType, formData.name);
-        
-        // Track high-value inquiry types separately
-        if (['wholesale', 'press'].includes(formData.inquiryType)) {
-          analytics.trackEvent('high_value_inquiry', {
-            inquiry_type: formData.inquiryType,
-            contact_method: 'contact_form',
-            estimated_value: formData.inquiryType === 'wholesale' ? 5000 : 1000
-          });
-        }
-
-        // Track customer quality indicators
-        const qualityScore = calculateCustomerQuality(formData);
-        analytics.trackEvent('customer_quality_score', {
-          score: qualityScore,
-          inquiry_type: formData.inquiryType,
-          factors: {
-            has_phone: !!formData.phone,
-            message_length: formData.message.length,
-            professional_email: isProfessionalEmail(formData.email)
-          }
-        });
-
-      } else {
-        const errorData = await response.json();
-        console.error('HubSpot submission error:', errorData);
-        throw new Error('Failed to submit form to HubSpot');
-      }
-    } catch (error) {
-      console.error('Contact form error:', error);
-      setStatus('error');
-      setErrorMessage('Something went wrong. Please try again or email us directly at help.velioranoir@gmail.com');
-      
-      // Track submission errors
-      analytics.trackEvent('contact_form_submission_error', {
-        error_message: error instanceof Error ? error.message : 'unknown_error',
-        inquiry_type: formData.inquiryType,
-        email_domain: formData.email.split('@')[1] || 'unknown'
-      });
-    }
   };
 
   // Helper function to get HubSpot cookie
-  const getCookie = (name: string) => {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift();
-    return null;
-  };
+//   const getCookie = (name: string) => {
+//     if (typeof document === 'undefined') return null;
+//     const value = `; ${document.cookie}`;
+//     const parts = value.split(`; ${name}=`);
+//     if (parts.length === 2) return parts.pop()?.split(';').shift();
+//     return null;
+//   };
 
   // Helper function to calculate customer quality score
-  const calculateCustomerQuality = (data: FormData): number => {
-    let score = 0;
+//   const calculateCustomerQuality = (data: FormData): number => {
+//     let score = 0;
     
-    // Phone number provided (+20 points)
-    if (data.phone) score += 20;
+//     // Phone number provided (+20 points)
+//     if (data.phone) score += 20;
     
-    // Professional email domain (+15 points)
-    if (isProfessionalEmail(data.email)) score += 15;
+//     // Professional email domain (+15 points)
+//     if (isProfessionalEmail(data.email)) score += 15;
     
-    // Detailed message (+10 points)
-    if (data.message.length > 100) score += 10;
+//     // Detailed message (+10 points)
+//     if (data.message.length > 100) score += 10;
     
-    // High-value inquiry type (+25 points)
-    if (['wholesale', 'press'].includes(data.inquiryType)) score += 25;
+//     // High-value inquiry type (+25 points)
+//     if (['wholesale', 'press'].includes(data.inquiryType)) score += 25;
     
-    // Complete form (+10 points)
-    if (data.subject) score += 10;
+//     // Complete form (+10 points)
+//     if (data.subject) score += 10;
     
-    return Math.min(score, 100); // Cap at 100
-  };
+//     return Math.min(score, 100); // Cap at 100
+//   };
 
   // Helper function to detect professional email
-  const isProfessionalEmail = (email: string): boolean => {
-    const domain = email.split('@')[1]?.toLowerCase() || '';
-    const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
-    return !personalDomains.includes(domain);
-  };
+//   const isProfessionalEmail = (email: string): boolean => {
+//     const domain = email.split('@')[1]?.toLowerCase() || '';
+//     const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com'];
+//     return !personalDomains.includes(domain);
+//   };
 
   const resetForm = () => {
     setFormData({
@@ -273,7 +213,7 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
             </p>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• Your inquiry has been added to our CRM system</li>
-              <li>• You'll receive a personalized response within 24 hours</li>
+              <li>• You&apos;ll receive a personalized response within 24 hours</li>
               <li>• For urgent matters, email help.velioranoir@gmail.com directly</li>
             </ul>
           </div>

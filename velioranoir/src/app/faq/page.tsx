@@ -112,13 +112,19 @@ export default function FAQ() {
   ];
 
   // Group FAQs by category
-  const faqsByCategory = faqs.reduce((acc, faq, index) => {
-    if (!acc[faq.category]) {
-      acc[faq.category] = [];
+    interface FAQItem {
+        category: string;
+        question: string;
+        answer: string;
+        index: number;
     }
-    acc[faq.category].push({ ...faq, index });
-    return acc;
-  }, {} as Record<string, any[]>);
+
+    const faqsByCategory = faqs.reduce<Record<string, FAQItem[]>>((acc, faq, index) => {
+        if (!acc[faq.category]) acc[faq.category] = [];
+        acc[faq.category].push({ ...faq, index });
+        return acc;
+    }, {});
+
 
   return (
     <main className="relative bg-white min-h-screen pt-28">
@@ -203,7 +209,7 @@ export default function FAQ() {
             Still Need Help?
           </h2>
           <p className="text-gray-600 mb-6">
-            Can't find what you're looking for? Our customer service team is here to help.
+            Can&apos;t find what you&apos;re looking for? Our customer service team is here to help.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

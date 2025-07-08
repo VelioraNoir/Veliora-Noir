@@ -203,7 +203,7 @@ export default function Necklaces() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {products.map((product, index) => (
+              {products.map((product) => (
                 <div key={product.id} className="product-card rounded-2xl overflow-hidden group h-full flex flex-col">
                   <Link 
                     href={`/products/${encodeURIComponent(product.id)}`}
@@ -363,7 +363,7 @@ export default function Necklaces() {
         </div>
       </section>
 
-      {/* Trust Signals */}
+      {/* Trust Signals
       <section className="px-8 pb-20">
         <div className="max-w-4xl mx-auto">
           <div className="glass-card p-8">
@@ -400,7 +400,7 @@ export default function Necklaces() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }
