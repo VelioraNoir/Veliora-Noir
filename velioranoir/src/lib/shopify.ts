@@ -1,5 +1,51 @@
 import { createStorefrontApiClient } from '@shopify/storefront-api-client';
 
+// GraphQL response types
+interface GraphQLImage {
+  url: string;
+  altText?: string;
+  width?: number;
+  height?: number;
+}
+
+interface GraphQLVariant {
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  price: {
+    amount: string;
+    currencyCode: string;
+  };
+}
+
+interface GraphQLProduct {
+  id: string;
+  title: string;
+  description: string;
+  vendor?: string;
+  productType?: string;
+  tags: string[];
+  images: {
+    edges: Array<{ node: GraphQLImage }>;
+  };
+  variants: {
+    edges: Array<{ node: GraphQLVariant }>;
+  };
+}
+
+interface GraphQLCartLine {
+  id: string;
+  quantity: number;
+  merchandise: {
+    id: string;
+    title: string;
+    product: {
+      id: string;
+      title: string;
+    };
+  };
+}
+
 // Keep existing interfaces for compatibility
 export interface Product {
   id: string;
@@ -185,19 +231,19 @@ export async function getAllProducts(): Promise<Product[]> {
       throw new ShopifyError(`GraphQL errors: ${JSON.stringify(errors)}`);
     }
 
-    return data.products.edges.map((edge: any) => {
+    return data.products.edges.map((edge: { node: GraphQLProduct }) => {
       const product = edge.node;
       return {
         id: product.id,
         title: product.title,
         description: product.description || '',
-        images: product.images.edges.map((imgEdge: any) => ({
+        images: product.images.edges.map((imgEdge: { node: GraphQLImage }) => ({
           src: imgEdge.node.url,
           altText: imgEdge.node.altText,
           width: imgEdge.node.width,
           height: imgEdge.node.height,
         })),
-        variants: product.variants.edges.map((variantEdge: any) => ({
+        variants: product.variants.edges.map((variantEdge: { node: GraphQLVariant }) => ({
           id: variantEdge.node.id,
           price: variantEdge.node.price.amount,
           currencyCode: variantEdge.node.price.currencyCode,
@@ -231,18 +277,18 @@ export async function getProduct(id: string): Promise<Product | null> {
 
     if (!data.product) return null;
 
-    const product = data.product;
+    const product: GraphQLProduct = data.product;
     return {
       id: product.id,
       title: product.title,
       description: product.description || '',
-      images: product.images.edges.map((imgEdge: any) => ({
+      images: product.images.edges.map((imgEdge: { node: GraphQLImage }) => ({
         src: imgEdge.node.url,
         altText: imgEdge.node.altText,
         width: imgEdge.node.width,
         height: imgEdge.node.height,
       })),
-      variants: product.variants.edges.map((variantEdge: any) => ({
+      variants: product.variants.edges.map((variantEdge: { node: GraphQLVariant }) => ({
         id: variantEdge.node.id,
         price: variantEdge.node.price.amount,
         currencyCode: variantEdge.node.price.currencyCode,
@@ -294,7 +340,7 @@ export async function createCheckout(lineItems: CheckoutLineItem[]) {
         amount: cart.cost.totalAmount.amount,
         currencyCode: cart.cost.totalAmount.currencyCode
       },
-      lineItems: cart.lines.edges.map((edge: any) => edge.node),
+      lineItems: cart.lines.edges.map((edge: { node: GraphQLCartLine }) => edge.node),
     };
   } catch (error) {
     console.error('❌ Cart creation failed:', error);
