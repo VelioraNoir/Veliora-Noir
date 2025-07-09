@@ -125,6 +125,11 @@ const CartDrawer = () => {
       });
 
       const data = await response.json();
+      
+      // DEBUG: Log the API response
+      console.log('🔍 API Response:', data);
+      console.log('🔍 Response status:', response.status);
+      console.log('🔍 Checkout URL from API:', data.checkoutUrl);
 
       if (response.ok && data.checkoutUrl) {
         console.log('✅ CartDrawer: Redirecting to checkout:', data.checkoutUrl);
