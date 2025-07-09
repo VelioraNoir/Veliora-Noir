@@ -309,9 +309,13 @@ export default function Necklaces() {
                   <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
                     {/* Placeholder for necklace styling image */}
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden">
+                    <img 
+                      src="/images/necklace.png" 
+                      alt="Elegant necklace design showcasing our collection"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                     </div>
                   </div>
                 </div>

@@ -1,10 +1,9 @@
-// src/components/cart/CartDrawer.tsx
+// src/components/cart/CartDrawer.tsx - UPDATED
 'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useCartStore, CartItem } from '../../store/cartStore';
-import { createCheckout } from '../../lib/shopify';
 import { analytics } from '../../lib/analytics';
 
 const CartDrawer = () => {
@@ -12,7 +11,6 @@ const CartDrawer = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  // NO GENERIC HERE — useCartStore is already typed by your CartStore interface
   const {
     items,
     isOpen,
@@ -77,7 +75,7 @@ const CartDrawer = () => {
     clearCart();
   };
 
-  // checkout flow
+  // UPDATED: checkout flow using API endpoint
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
@@ -93,7 +91,9 @@ const CartDrawer = () => {
     });
     const totalValue = getTotalPrice();
 
+    // Track checkout initiation
     analytics.initiateCheckout(checkoutItems, totalValue);
+    
     if (totalValue > 500) {
       analytics.trackEvent('luxury_cart_checkout', {
         cart_value: totalValue,
@@ -107,28 +107,52 @@ const CartDrawer = () => {
     setCheckoutError(null);
 
     try {
+      // Convert cart items to API format
       const lineItems = items.map((item) => ({
         variantId: item.variantId,
         quantity: item.quantity,
       }));
-      const checkout = await createCheckout(lineItems);
-      analytics.trackEvent('checkout_success', {
-        checkout_id: checkout.id,
-        items_count: items.length,
-        cart_value: totalValue,
-        redirect_method: 'shopify_checkout',
+
+      console.log('🛒 Starting checkout with items:', lineItems);
+
+      // Call our API endpoint instead of createCheckout directly
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lineItems })
       });
-      window.location.href = checkout.webUrl;
+
+      const data = await response.json();
+
+      if (response.ok && data.checkoutUrl) {
+        console.log('✅ Redirecting to checkout:', data.checkoutUrl);
+        
+        analytics.trackEvent('checkout_success', {
+          checkout_id: data.checkoutId,
+          items_count: items.length,
+          cart_value: totalValue,
+          redirect_method: 'shopify_checkout',
+        });
+
+        // Clear cart and redirect
+        clearCart();
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout');
+      }
+
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Checkout failed. Please try again.';
+      const message = error instanceof Error ? error.message : 'Checkout failed. Please try again.';
       setCheckoutError(message);
       setIsCheckingOut(false);
+      
       analytics.trackEvent('checkout_error', {
         error_message: message,
         items_count: items.length,
         cart_value: getTotalPrice(),
-        checkout_method: 'shopify',
+        checkout_method: 'api_endpoint',
       });
     }
   };
