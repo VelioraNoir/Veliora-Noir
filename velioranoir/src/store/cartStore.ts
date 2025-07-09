@@ -1,4 +1,4 @@
-// src/store/cartStore.ts - REPLACE ENTIRE FILE
+// src/store/cartStore.ts - FIXED VERSION
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '../lib/shopify';
@@ -27,7 +27,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      isOpen: false,
+      isOpen: false, // Always start closed
       
       addItem: (product, variantId) => {
         const existingItemIndex = get().items.findIndex(
@@ -77,7 +77,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], isOpen: false }); // Close cart when clearing
       },
 
       toggleCart: () => {
@@ -97,6 +97,10 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'veliora-noir-cart',
+      // Only persist items, not the isOpen state
+      partialize: (state) => ({
+        items: state.items,
+      }),
     }
   )
 );
