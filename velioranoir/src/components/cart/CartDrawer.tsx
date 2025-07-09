@@ -1,4 +1,4 @@
-// src/components/cart/CartDrawer.tsx - UPDATED
+// src/components/cart/CartDrawer.tsx - UPDATED TO USE API ONLY
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -75,7 +75,7 @@ const CartDrawer = () => {
     clearCart();
   };
 
-  // UPDATED: checkout flow using API endpoint
+  // FIXED: checkout flow using API endpoint ONLY
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
@@ -113,9 +113,9 @@ const CartDrawer = () => {
         quantity: item.quantity,
       }));
 
-      console.log('🛒 Starting checkout with items:', lineItems);
+      console.log('🛒 CartDrawer: Starting checkout with API endpoint');
 
-      // Call our API endpoint instead of createCheckout directly
+      // Call our API endpoint (NOT createCheckout directly)
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -127,13 +127,13 @@ const CartDrawer = () => {
       const data = await response.json();
 
       if (response.ok && data.checkoutUrl) {
-        console.log('✅ Redirecting to checkout:', data.checkoutUrl);
+        console.log('✅ CartDrawer: Redirecting to checkout:', data.checkoutUrl);
         
         analytics.trackEvent('checkout_success', {
           checkout_id: data.checkoutId,
           items_count: items.length,
           cart_value: totalValue,
-          redirect_method: 'shopify_checkout',
+          redirect_method: 'api_endpoint',
         });
 
         // Clear cart and redirect
