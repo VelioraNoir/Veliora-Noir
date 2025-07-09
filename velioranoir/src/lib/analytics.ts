@@ -1,3 +1,4 @@
+// src/lib/analytics.ts - COMPLETE FILE
 // Analytics and tracking utilities for Veliora Noir
 
 // Add at top of file (or in a shared types file)
@@ -5,7 +6,6 @@ interface GA4Params extends Record<string, unknown> {
   label?: string;
   value?: number;
 }
-
 
 declare global {
   interface Window {
@@ -37,6 +37,7 @@ export const trackGA4Event = (
     });
   }
 };
+
 // Facebook Pixel Events
 export const trackFacebookEvent = (
   eventName: string,
@@ -201,14 +202,28 @@ export const analytics = {
     });
   },
 
+  // UPDATED: Enhanced checkout tracking
   initiateCheckout: (
-    items: Array<{ id: string }>,
+    items: Array<{
+      id: string;
+      name: string;
+      category: string;
+      quantity: number;
+      price: number;
+    }>,
     totalValue: number
   ) => {
+    // Track in multiple formats for compatibility
     trackEvent('begin_checkout', {
       value: totalValue,
       currency: 'USD',
-      items,
+      items: items.map(item => ({
+        item_id: item.id,
+        item_name: item.name,
+        item_category: item.category,
+        quantity: item.quantity,
+        price: item.price
+      }))
     });
 
     trackFacebookEvent('InitiateCheckout', {
@@ -224,6 +239,15 @@ export const analytics = {
       value: totalValue,
       currency: 'USD',
     });
+
+    // Console log for development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🛒 Checkout initiated:', {
+        total: totalValue,
+        itemCount: items.length,
+        items: items.length
+      });
+    }
   },
 
   purchase: (

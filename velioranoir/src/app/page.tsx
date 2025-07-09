@@ -1,4 +1,4 @@
-// src/app/page.tsx - UPDATED WITHOUT CART DRAWER
+// src/app/page.tsx - COMPLETE FILE WITH CUSTOM NEWSLETTER
 'use client';
 
 import Image from 'next/image';
@@ -10,8 +10,141 @@ import Advanced3DViewer from '../components/3d/Advanced3DScene';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import PresaleBanner from '../components/ui/PresaleBanner';
-import NewsletterSignup from '../components/ui/NewsletterSignup';
+import CartDrawer from '../components/cart/CartDrawer';
+import CartIcon from '../components/ui/CartIcon';
 import { analytics } from '../lib/analytics';
+
+// Custom Newsletter Component for Klaviyo
+const CustomNewsletterForm = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+  const [showCoupon, setShowCoupon] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    
+    try {
+      // Call Klaviyo's identify API
+      const response = await fetch('/api/klaviyo-subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setMessage('Successfully subscribed! Here\'s your exclusive offer:');
+        setEmail('');
+        setShowCoupon(true); // Show coupon popup
+        
+        // Track successful subscription
+        analytics.trackEvent('newsletter_subscription', {
+          source: 'homepage',
+          email_domain: email.split('@')[1]
+        });
+      } else {
+        throw new Error('Subscription failed');
+      }
+    } catch (error) {
+      setStatus('error');
+      setMessage('Something went wrong. Please try again.');
+      console.error('Newsletter subscription error:', error);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email address"
+            required
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
+            disabled={status === 'loading'}
+          />
+          <button
+            type="submit"
+            disabled={status === 'loading' || !email}
+            className="btn-primary whitespace-nowrap"
+          >
+            {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+          </button>
+        </div>
+      </form>
+      
+      {/* Status Messages */}
+      {status === 'success' && (
+        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+          <p className="text-green-800 text-center">{message}</p>
+        </div>
+      )}
+      
+      {status === 'error' && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-red-800 text-center">{message}</p>
+        </div>
+      )}
+
+      {/* Coupon Popup */}
+      {showCoupon && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl animate-fade-in-up">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center p-2">
+                <Image
+                  src="/logo.png"
+                  alt="Veliora Noir Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-2xl font-playfair font-semibold text-gray-900 mb-2">
+                Welcome to Veliora Noir!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Thank you for subscribing. Here&apos;s your exclusive 30% off coupon:
+              </p>
+              
+              {/* Coupon Code */}
+              <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-4 rounded-xl mb-6">
+                <p className="text-sm font-medium mb-1">Use code:</p>
+                <p className="text-2xl font-bold tracking-wider">WELCOME30</p>
+              </div>
+              
+              <p className="text-sm text-gray-500 mb-6">
+                Valid for 7 days on your first order. Cannot be combined with other offers.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link 
+                  href="/collections" 
+                  className="btn-primary flex-1"
+                  onClick={() => setShowCoupon(false)}
+                >
+                  Shop Now
+                </Link>
+                <button 
+                  onClick={() => setShowCoupon(false)}
+                  className="btn-secondary flex-1"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Enhanced Product Card with Cart Integration and Links - WITH FIXED WISHLIST
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
@@ -153,7 +286,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               {[...Array(5)].map((_, i) => (
                 <svg 
                   key={i} 
-                  className="w-4 h-4 text-gray-300" 
+                  className="w-4 h-4 text-yellow-400" 
                   fill="currentColor" 
                   viewBox="0 0 20 20"
                 >
@@ -339,6 +472,12 @@ export default function Home() {
 
   return (
     <>
+      {/* Cart Drawer */}
+      <CartDrawer />
+      
+      {/* Floating Cart Icon */}
+      <CartIcon />
+      
       {/* Presale Banner */}
       <PresaleBanner 
         startDate="2024-07-10T20:00:00Z" // July 10th, 12pm PST / 9am HST
@@ -383,10 +522,23 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Newsletter Section */}
+        {/* Newsletter Section - Custom Klaviyo Integration */}
         <section className="py-20 px-8">
           <div className="max-w-4xl mx-auto">
-            <NewsletterSignup source="homepage" />
+            {/* Newsletter Box Container */}
+            <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-3xl p-12 shadow-lg">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-semibold tracking-tight text-black mb-4">
+                  Stay Connected
+                </h2>
+                <p className="text-xl text-gray-600 mb-8">
+                  Be the first to know about new collections, exclusive offers, and luxury jewelry insights.
+                </p>
+              </div>
+              
+              {/* Custom Newsletter Form */}
+              <CustomNewsletterForm />
+            </div>
           </div>
         </section>
       </main>
