@@ -1,4 +1,4 @@
-// src/app/layout.tsx - FIXED WITH CART DRAWER ON ALL PAGES
+// src/app/layout.tsx - FIXED WITH NO HORIZONTAL OVERFLOW
 import type { Metadata } from "next";
 import { Inter, Playfair_Display_SC } from 'next/font/google';
 import Header from '../components/layout/Header';
@@ -6,7 +6,7 @@ import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import Script from 'next/script';
 import "./globals.css";
-import Image from 'next/image';
+
 
 // Configure fonts with Next.js optimization
 const inter = Inter({
@@ -190,7 +190,7 @@ export default function RootLayout({
         )}
       </head>
       
-      <body className="bg-metallic-mesh min-h-screen antialiased">
+      <body className="bg-metallic-mesh min-h-screen antialiased overflow-x-hidden">
         {/* Google Tag Manager - Body (noscript fallback) */}
         {GTM_ID && (
           <noscript>
@@ -206,24 +206,24 @@ export default function RootLayout({
         {/* Facebook Pixel - noscript fallback */}
         {FACEBOOK_PIXEL_ID && (
           <noscript>
-            <Image
-              height={1}
-              width={1}
-              style={{ display: 'none' }}
-              src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
-              alt=""
-            />
-          </noscript>
+  <img
+    height="1"
+    width="1"
+    style={{ display: 'none' }}
+    src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
+    alt=""
+  />
+</noscript>
         )}
 
-        {/* Subtle metallic overlay for depth */}
-        <div className="fixed inset-0 bg-gradient-to-br from-white/50 via-transparent to-metallic-platinum-100/30 pointer-events-none" />
+        {/* Subtle metallic overlay for depth - FIXED: no horizontal overflow */}
+        <div className="fixed inset-0 bg-gradient-to-br from-white/50 via-transparent to-metallic-platinum-100/30 pointer-events-none overflow-hidden" />
         
         {/* Header */}
         <Header />
         
-        {/* Main content with proper spacing for fixed header */}
-        <div className="relative z-10 pt-20">
+        {/* Main content with proper spacing for fixed header - FIXED: no horizontal overflow */}
+        <div className="relative z-10 pt-20 overflow-x-hidden">
           {children}
         </div>
         
@@ -233,9 +233,9 @@ export default function RootLayout({
         {/* CART DRAWER - NOW AVAILABLE ON ALL PAGES */}
         <CartDrawer />
         
-        {/* Subtle shine effect that moves across the page */}
+        {/* Subtle shine effect - FIXED: contained properly */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -inset-10 opacity-30">
+          <div className="absolute inset-0 opacity-30 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-metallic-silver-200/20 to-transparent transform -skew-x-12 animate-metallic-shine" />
           </div>
         </div>

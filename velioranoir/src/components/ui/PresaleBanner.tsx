@@ -1,4 +1,4 @@
-// src/components/ui/PresaleBanner.tsx - REPLACE ENTIRE FILE
+// src/components/ui/PresaleBanner.tsx - FIXED MOBILE CENTERING
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -46,29 +46,30 @@ export default function PresaleBanner({
   if (!isVisible || !isMounted) return null;
 
   return (
-    <div className={`relative bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white border-b border-gray-800 ${className}`}>
+    <div className={`relative bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white border-b border-gray-800 overflow-hidden ${className}`}>
       {/* Subtle luxury background pattern */}
       <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-transparent via-white to-transparent" />
       
-      <div className="relative max-w-7xl mx-auto px-8 py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center space-y-1">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between gap-4">
+          {/* FIXED: Better mobile centering with responsive margins */}
+          <div className="flex-1 flex items-center justify-center min-w-0">
+            <div className="text-center space-y-2 max-w-2xl w-full px-2 sm:px-4">
               {!presaleStarted ? (
                 <>
-                  <p className="text-sm font-light tracking-wide text-gray-300 uppercase">
+                  <p className="text-xs sm:text-sm font-light tracking-wide text-gray-300 uppercase">
                     Exclusive Preview
                   </p>
-                  <h3 className="text-lg font-playfair font-medium tracking-wide">
+                  <h3 className="text-base sm:text-lg font-playfair font-medium tracking-wide leading-tight">
                     Our inaugural collection launches July 10th
                   </h3>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
                     Be among the first to discover handcrafted luxury • Early access subscribers receive {discount} off
                   </p>
-                  <div className="pt-3">
+                  <div className="pt-2 sm:pt-3">
                     <Link 
                       href="/collections" 
-                      className="inline-flex items-center px-6 py-2 text-sm font-medium tracking-wide border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/5"
+                      className="inline-flex items-center px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium tracking-wide border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/5 rounded"
                     >
                       Preview Collection
                     </Link>
@@ -76,19 +77,19 @@ export default function PresaleBanner({
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-light tracking-wide text-gray-300 uppercase">
+                  <p className="text-xs sm:text-sm font-light tracking-wide text-gray-300 uppercase">
                     Now Available
                   </p>
-                  <h3 className="text-lg font-playfair font-medium tracking-wide">
+                  <h3 className="text-base sm:text-lg font-playfair font-medium tracking-wide leading-tight">
                     Our inaugural collection is here
                   </h3>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
                     Handcrafted luxury accessories • Early supporters enjoy {discount} off
                   </p>
-                  <div className="pt-3">
+                  <div className="pt-2 sm:pt-3">
                     <Link 
                       href="/collections" 
-                      className="inline-flex items-center px-6 py-2 text-sm font-medium tracking-wide bg-white text-black hover:bg-gray-100 transition-all duration-300"
+                      className="inline-flex items-center px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium tracking-wide bg-white text-black hover:bg-gray-100 transition-all duration-300 rounded"
                     >
                       Shop Collection
                     </Link>
@@ -98,10 +99,10 @@ export default function PresaleBanner({
             </div>
           </div>
 
-          {/* Elegant close button */}
+          {/* FIXED: More responsive close button */}
           <button
             onClick={handleClose}
-            className="ml-8 p-2 hover:bg-white/5 rounded-full transition-colors duration-200 group"
+            className="flex-shrink-0 p-2 hover:bg-white/5 rounded-full transition-colors duration-200 group"
             aria-label="Close"
           >
             <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">

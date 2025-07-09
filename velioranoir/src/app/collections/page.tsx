@@ -33,7 +33,7 @@ export default function Collections() {
   return (
     <main className="relative bg-white min-h-screen">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="px-8 pt-4">
+      <nav aria-label="Breadcrumb" className="px-8 pt-8">
         <ol className="list-reset flex text-gray-500">
           <li><Link href="/" className="hover:underline">Home</Link></li>
           <li><span className="mx-2">/</span></li>

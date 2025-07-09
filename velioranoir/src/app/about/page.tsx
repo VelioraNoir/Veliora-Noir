@@ -31,12 +31,12 @@ export default function About() {
     }
   ];
 
-  const stats = [
-    { number: "10K+", label: "Happy Customers" },
-    { number: "500+", label: "Curated Pieces" },
-    { number: "50+", label: "Countries Served" },
-    { number: "99%", label: "Satisfaction Rate" }
-  ];
+  // const stats = [
+  //   { number: "10K+", label: "Happy Customers" },
+  //   { number: "500+", label: "Curated Pieces" },
+  //   { number: "50+", label: "Countries Served" },
+  //   { number: "99%", label: "Satisfaction Rate" }
+  // ];
 
   return (
     <main className="relative bg-white min-h-screen">
@@ -132,7 +132,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section
       <section className="py-20 px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-playfair font-bold text-black mb-12">
@@ -152,7 +152,7 @@ export default function About() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Experience Section */}
       <section className="py-20 px-8 bg-gradient-to-br from-gray-50 to-white">
