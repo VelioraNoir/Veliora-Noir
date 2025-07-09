@@ -24,6 +24,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; /* FIXED: Prevent horizontal scroll */
+  width: 100%;
 }
 
 body {
@@ -35,6 +37,9 @@ body {
   font-feature-settings: 'rlig' 1, 'calt' 1;
   line-height: 1.47;
   letter-spacing: -0.022em;
+  overflow-x: hidden; /* FIXED: Prevent horizontal scroll */
+  width: 100%;
+  position: relative;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -334,6 +339,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-luxury-pulse {
   animation: luxuryPulse 2s ease-in-out infinite;
+}
+
+.animate-metallic-shine {
+  animation: metallicShine 3s ease-in-out infinite;
 }
 
 /* Luxury cursor effects */

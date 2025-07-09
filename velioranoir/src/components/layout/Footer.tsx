@@ -51,7 +51,7 @@ const Footer = () => {
       href: 'https://facebook.com/velioranoir',
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+          <path d="M24 12.073c0-6.627-5.373-12-12-5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
         </svg>
       ),
     },
@@ -70,7 +70,7 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-1 space-y-6">
@@ -145,7 +145,7 @@ const Footer = () => {
 
         {/* Newsletter Signup */}
         <div className="mt-12 pt-8 border-t border-gray-700">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start lg:items-center">
             <div>
               <h4 className="font-playfair text-xl font-medium text-white mb-2">
                 Stay Updated
@@ -154,15 +154,18 @@ const Footer = () => {
                 Get notified about new collections, exclusive offers, and craftsmanship insights.
               </p>
             </div>
-            <div className="flex gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-6 py-3 bg-gray-700 border border-gray-600 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-              />
-              <button className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-medium rounded-full transition-colors duration-300">
-                Subscribe
-              </button>
+            {/* Fixed mobile layout */}
+            <div className="w-full">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 sm:px-6 py-3 bg-gray-700 border border-gray-600 rounded-full text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent w-full"
+                />
+                <button className="px-6 sm:px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-medium rounded-full transition-colors duration-300 whitespace-nowrap">
+                  Subscribe
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -170,11 +173,11 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-700">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
               <p>&copy; 2024 Veliora Noir. All rights reserved.</p>
-              <div className="flex space-x-6">
+              <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6">
                 <Link href="/privacy" className="hover:text-yellow-400 transition-colors duration-200">
                   Privacy Policy
                 </Link>
@@ -188,9 +191,9 @@ const Footer = () => {
             </div>
 
             {/* Payment Methods */}
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <span className="text-sm text-gray-400">Secure payments:</span>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 {paymentMethods.map((method) => (
                   <div
                     key={method.name}
@@ -206,7 +209,7 @@ const Footer = () => {
           
           {/* Additional Info */}
           <div className="mt-4 text-center">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 px-4">
               All major credit cards and digital wallets accepted • Secure SSL encryption • Shopify Payments
             </p>
           </div>
