@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getAllProductsWithFallback, Product } from '../lib/shopify';
 import { ProductCardSkeleton, ErrorMessage } from '../components/ui/LoadingComponents';
-import Advanced3DViewer from '../components/3d/Advanced3DScene';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import PresaleBanner from '../components/ui/PresaleBanner';
@@ -211,7 +210,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
     <Link 
       href={`/products/${encodeURIComponent(product.id)}`}
       onClick={handleProductClick}
-      className="block product-card rounded-2xl overflow-hidden animate-fade-in-up group h-full flex flex-col"
+      className="block bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl overflow-hidden animate-fade-in-up group h-full flex flex-col shadow-sm hover:shadow-md transition-all duration-300"
       style={{ animationDelay: `${index * 100}ms` }}
       data-luxury-action="product_card_click"
     >
@@ -366,12 +365,33 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Enhanced 3D Showcase */}
+          {/* Hero Image Showcase */}
           <div className="animate-fade-in-up delay-400">
-            <Advanced3DViewer 
-              className="h-[500px]" 
-              enablePostProcessing={true}
-            />
+            <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-lg">
+              <img 
+                src="/images/hero-jewelry.png" 
+                alt="Elegant jewelry collection showcase"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to a placeholder if image doesn't exist
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                      <div class="text-center p-8">
+                        <div class="w-16 h-16 mx-auto mb-4 text-gray-400">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                          </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-600 mb-2">Exquisite Craftsmanship</h3>
+                        <p class="text-sm text-gray-500">Every piece tells a story of elegance and sophistication</p>
+                      </div>
+                    </div>
+                  `;
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
