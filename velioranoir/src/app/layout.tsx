@@ -1,4 +1,4 @@
-// src/app/layout.tsx - FIXED WITH NO HORIZONTAL OVERFLOW
+// src/app/layout.tsx - FIXED WITH NO HORIZONTAL OVERFLOW + SHOPIFY REDIRECT FIX
 import type { Metadata } from "next";
 import { Inter, Playfair_Display_SC } from 'next/font/google';
 import Header from '../components/layout/Header';
@@ -91,6 +91,54 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+        {/* SHOPIFY REDIRECT FIX - Handle users coming from checkout */}
+        <Script
+          id="shopify-redirect-fix"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Fix for Shopify checkout "Continue Shopping" redirect issue
+              (function() {
+                try {
+                  const referrer = document.referrer || '';
+                  const currentUrl = window.location.href;
+                  
+                  // Check if user came from Shopify checkout/thank you page
+                  if (referrer.includes('myshopify.com') || 
+                      referrer.includes('shopify.com')) {
+                    
+                    // Only redirect if we're not already on the right domain
+                    if (!currentUrl.includes('velioranoir.com')) {
+                      console.log('🔄 Redirecting from Shopify to custom domain');
+                      window.location.replace('https://velioranoir.com');
+                      return;
+                    }
+                    
+                    // Track successful return from checkout
+                    if (window.gtag) {
+                      window.gtag('event', 'return_from_checkout', {
+                        event_category: 'checkout_flow',
+                        event_label: 'successful_return'
+                      });
+                    }
+                  }
+                  
+                  // Also handle direct visits to wrong domain
+                  if (currentUrl.includes('myshopify.com') && 
+                      !currentUrl.includes('/cart') && 
+                      !currentUrl.includes('/checkout') &&
+                      !currentUrl.includes('/thank_you')) {
+                    window.location.replace('https://velioranoir.com');
+                  }
+                  
+                } catch (error) {
+                  console.log('Redirect script error:', error);
+                }
+              })();
+            `,
+          }}
+        />
 
         {/* Google Tag Manager - Head */}
         {GTM_ID && (
