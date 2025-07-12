@@ -23,44 +23,69 @@ declare global {
   }
 }
 
-
-// Add this to the top of your analytics.ts file, after the global declarations
-
-// Replace with your actual Meta Pixel ID from Meta Ads Manager
-// Initialize Meta Pixel - add this function to your analytics.ts
-
-const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+// REMOVED DUPLICATE: const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 export const initMetaPixel = () => {
-  if (typeof window !== 'undefined' && !window.fbq && META_PIXEL_ID) {
-    // Create and load the Facebook Pixel script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://connect.facebook.net/en_US/fbevents.js';
-    document.head.appendChild(script);
-
-    // Initialize fbq function with queue property
-    window.fbq = Object.assign(
-      function(...args: unknown[]) {
-        (window.fbq.q = window.fbq.q || []).push(args);
-      },
-      { q: [] as unknown[] }
-    );
-
-    // Initialize the pixel with your ID
-    window.fbq('init', META_PIXEL_ID);
-    window.fbq('track', 'PageView');
-
-    // Console log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📘 Meta Pixel initialized with ID:', META_PIXEL_ID);
-    }
-  } else if (!META_PIXEL_ID && process.env.NODE_ENV === 'development') {
-    console.warn('⚠️ Meta Pixel ID not found in environment variables');
+  console.log('🔍 initMetaPixel called');
+  
+  if (typeof window === 'undefined') {
+    console.log('❌ Not in browser environment');
+    return;
   }
+
+  const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  console.log('🆔 Pixel ID from env:', META_PIXEL_ID);
+
+  if (!META_PIXEL_ID) {
+    console.error('❌ META_PIXEL_ID not found in environment variables');
+    return;
+  }
+
+  if (typeof window.fbq !== 'undefined') {
+    console.log('⚠️ Meta Pixel already loaded');
+    return;
+  }
+
+  console.log('📡 Loading Meta Pixel script...');
+
+  // Create and load the Facebook Pixel script
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+  script.onload = () => {
+    console.log('✅ Meta Pixel script loaded successfully');
+  };
+  script.onerror = () => {
+    console.error('❌ Failed to load Meta Pixel script');
+  };
+  document.head.appendChild(script);
+
+  // Initialize fbq function with queue property
+  window.fbq = Object.assign(
+    function(...args: unknown[]) {
+      (window.fbq.q = window.fbq.q || []).push(args);
+    },
+    { q: [] as unknown[] }
+  );
+
+  console.log('🚀 Initializing pixel with ID:', META_PIXEL_ID);
+
+  // Initialize the pixel with your ID
+  window.fbq('init', META_PIXEL_ID);
+  window.fbq('track', 'PageView');
+
+  console.log('✅ Meta Pixel initialized and PageView tracked');
+
+  // Test if fbq is working
+  setTimeout(() => {
+    if (typeof window.fbq !== 'undefined') {
+      console.log('✅ window.fbq is available:', typeof window.fbq);
+      console.log('📊 fbq queue:', window.fbq.q);
+    } else {
+      console.error('❌ window.fbq is not available after initialization');
+    }
+  }, 1000);
 };
-
-
 
 // Google Analytics 4 Events
 export const trackGA4Event = (
@@ -95,7 +120,9 @@ export const trackTikTokEvent = (
   eventName: string,
   parameters: Record<string, unknown> = {}
 ) => {
-  if (typeof window !== 'undefined' && window.ttq) {
+  const pixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
+  
+  if (typeof window !== 'undefined' && window.ttq && pixelId && pixelId !== 'placeholder') {
     window.ttq.track(eventName, parameters);
   }
 };
@@ -378,13 +405,14 @@ export const analytics = {
 export const initializeAnalytics = () => {
   if (typeof window === 'undefined') return;
 
+  // Initialize Meta Pixel first
+  initMetaPixel();
+
   analytics.pageView(document.title, 'home');
 
   let scrollTracked = false;
   const trackScrollDepth = () => {
     if (scrollTracked) return;
-
-    initMetaPixel();
 
     const scrollPercent = Math.round(
       (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
