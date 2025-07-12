@@ -409,7 +409,7 @@ export default function ProductPage() {
                   <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
-                  <p className="text-sm text-gray-600">Free Shipping $200+</p>
+                  <p className="text-sm text-gray-600">Free Shipping</p>
                 </div>
                 <div className="text-center">
                   <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -464,9 +464,7 @@ export default function ProductPage() {
                     </svg>
                   </summary>
                   <div className="mt-4 text-gray-600 space-y-2">
-                    <p>• Free shipping on orders over $200</p>
-                    <p>• 2-3 business days processing</p>
-                    <p>• 5-7 business days shipping</p>
+                    <p>• Free shipping</p>
                     <p>• 30-day return window</p>
                     <p>• Free returns on all orders</p>
                   </div>
