@@ -10,7 +10,10 @@ interface GA4Params extends Record<string, unknown> {
 declare global {
   interface Window {
     gtag: (...args: unknown[]) => void;
-    fbq: (...args: unknown[]) => void;
+    fbq: {
+      (...args: unknown[]): void;
+      q?: unknown[];
+    };
     ttq: {
       track: (eventName: string, parameters?: Record<string, unknown>) => void;
       [key: string]: unknown;
@@ -19,6 +22,45 @@ declare global {
     _hsq: unknown[];
   }
 }
+
+
+// Add this to the top of your analytics.ts file, after the global declarations
+
+// Replace with your actual Meta Pixel ID from Meta Ads Manager
+// Initialize Meta Pixel - add this function to your analytics.ts
+
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+
+export const initMetaPixel = () => {
+  if (typeof window !== 'undefined' && !window.fbq && META_PIXEL_ID) {
+    // Create and load the Facebook Pixel script
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(script);
+
+    // Initialize fbq function with queue property
+    window.fbq = Object.assign(
+      function(...args: unknown[]) {
+        (window.fbq.q = window.fbq.q || []).push(args);
+      },
+      { q: [] as unknown[] }
+    );
+
+    // Initialize the pixel with your ID
+    window.fbq('init', META_PIXEL_ID);
+    window.fbq('track', 'PageView');
+
+    // Console log for development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📘 Meta Pixel initialized with ID:', META_PIXEL_ID);
+    }
+  } else if (!META_PIXEL_ID && process.env.NODE_ENV === 'development') {
+    console.warn('⚠️ Meta Pixel ID not found in environment variables');
+  }
+};
+
+
 
 // Google Analytics 4 Events
 export const trackGA4Event = (
@@ -341,6 +383,8 @@ export const initializeAnalytics = () => {
   let scrollTracked = false;
   const trackScrollDepth = () => {
     if (scrollTracked) return;
+
+    initMetaPixel();
 
     const scrollPercent = Math.round(
       (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
