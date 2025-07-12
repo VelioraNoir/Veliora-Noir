@@ -98,7 +98,7 @@ const CustomNewsletterForm = () => {
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center p-2">
                 <Image
-                  src="/logo.png"
+                  src="/images/logo.png"
                   alt="Veliora Noir Logo"
                   width={40}
                   height={40}
