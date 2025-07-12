@@ -500,8 +500,8 @@ export default function Home() {
       
       {/* Presale Banner */}
       <PresaleBanner 
-        startDate="2024-07-10T20:00:00Z" // July 10th, 12pm PST / 9am HST
-        discount="20%" 
+        
+
       />
       
       <main className="relative bg-white min-h-screen">
