@@ -84,7 +84,7 @@ export default function About() {
             <div className="relative animate-fade-in-up delay-200">
               <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=600&fit=crop&crop=center"
+                  src="/images/earring.png"
                   alt="Luxury jewelry collection"
                   width={600}
                   height={600}
@@ -161,7 +161,7 @@ export default function About() {
             <div className="relative animate-fade-in-up">
               <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=450&fit=crop&crop=center"
+                  src="/images/necklace.png"
                   alt="Luxury shopping experience"
                   width={600}
                   height={450}

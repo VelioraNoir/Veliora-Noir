@@ -213,7 +213,7 @@ export default function Necklaces() {
                   >
                     <div className="product-card-image aspect-square relative">
                       <Image
-                        src={product.images[0]?.src || '/placeholder-product.jpg'}
+                        src={product.images[0]?.src || '/images/ring.png'}
                         alt={product.images[0]?.altText || product.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
