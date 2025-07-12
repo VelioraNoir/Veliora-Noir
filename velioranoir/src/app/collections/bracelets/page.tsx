@@ -307,13 +307,14 @@ export default function Bracelets() {
                     </div>
                   </div>
                   
-                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <svg className="w-16 h-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                      </svg>
-                      <p className="text-sm">Sizing Guide Illustration</p>
-                    </div>
+                  <div className="aspect-square relative rounded-xl overflow-hidden">
+                    <Image
+                      src="/images/bracelet.png" // Add your sizing guide image here
+                      alt="Bracelet sizing guide showing how to measure wrist"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
                   </div>
                 </div>
               </div>
