@@ -422,6 +422,11 @@ const ProductsGrid = ({ products }: { products: Product[] }) => {
 
 // Main Page Component
 export default function Home() {
+  useEffect(() => {
+    console.log('🧪 Testing from page.tsx');
+    console.log('🧪 Env var:', process.env.NEXT_PUBLIC_META_PIXEL_ID);
+  }, []);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
