@@ -425,6 +425,11 @@ export default function Home() {
   useEffect(() => {
     console.log('🧪 Testing from page.tsx');
     console.log('🧪 Env var:', process.env.NEXT_PUBLIC_META_PIXEL_ID);
+
+    // Force analytics initialization
+  import('../lib/analytics').then(({ initializeAnalytics }) => {
+    initializeAnalytics();
+  });
   }, []);
 
   const [products, setProducts] = useState<Product[]>([]);
