@@ -23,7 +23,15 @@ declare global {
   }
 }
 
-// REMOVED DUPLICATE: const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+
+// Add this to the top of your analytics.ts file, after the global declarations
+
+// Replace with your actual Meta Pixel ID from Meta Ads Manager
+// Initialize Meta Pixel - add this function to your analytics.ts
+
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+
+// Add this debug version to your analytics.ts file
 
 export const initMetaPixel = () => {
   console.log('🔍 initMetaPixel called');
@@ -87,6 +95,8 @@ export const initMetaPixel = () => {
   }, 1000);
 };
 
+
+
 // Google Analytics 4 Events
 export const trackGA4Event = (
   eventName: string,
@@ -120,9 +130,7 @@ export const trackTikTokEvent = (
   eventName: string,
   parameters: Record<string, unknown> = {}
 ) => {
-  const pixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
-  
-  if (typeof window !== 'undefined' && window.ttq && pixelId && pixelId !== 'placeholder') {
+  if (typeof window !== 'undefined' && window.ttq) {
     window.ttq.track(eventName, parameters);
   }
 };
@@ -405,14 +413,13 @@ export const analytics = {
 export const initializeAnalytics = () => {
   if (typeof window === 'undefined') return;
 
-  // Initialize Meta Pixel first
-  initMetaPixel();
-
   analytics.pageView(document.title, 'home');
 
   let scrollTracked = false;
   const trackScrollDepth = () => {
     if (scrollTracked) return;
+
+    initMetaPixel();
 
     const scrollPercent = Math.round(
       (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
