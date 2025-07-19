@@ -29,8 +29,6 @@ declare global {
 // Replace with your actual Meta Pixel ID from Meta Ads Manager
 // Initialize Meta Pixel - add this function to your analytics.ts
 
-const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
-
 // Add this debug version to your analytics.ts file
 
 export const initMetaPixel = () => {
