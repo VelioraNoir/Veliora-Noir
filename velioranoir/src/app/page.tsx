@@ -422,15 +422,54 @@ const ProductsGrid = ({ products }: { products: Product[] }) => {
 
 // Main Page Component
 export default function Home() {
-  useEffect(() => {
-    console.log('🧪 Testing from page.tsx');
-    console.log('🧪 Env var:', process.env.NEXT_PUBLIC_META_PIXEL_ID);
+  // In your page.tsx file, replace your existing useEffect with this:
 
-    // Force analytics initialization
+useEffect(() => {
+  console.log('🧪 Testing from page.tsx');
+  console.log('🧪 Env var:', process.env.NEXT_PUBLIC_META_PIXEL_ID);
+
+  // Force analytics initialization
   import('../lib/analytics').then(({ initializeAnalytics }) => {
     initializeAnalytics();
+    
+    // Add debugging after pixel loads
+    setTimeout(() => {
+      console.log('🔍 Debugging pixel status...');
+      
+      // Check for duplicate pixels
+      console.log('📊 All fbq instances:', typeof window.fbq);
+      console.log('📊 fbq queue length:', window.fbq?.q?.length || 0);
+      console.log('📊 fbq queue:', window.fbq?.q || []);
+      
+      // Check dataLayer
+      console.log('📊 dataLayer:', window.dataLayer || 'Not found');
+      
+      // Check for multiple pixel scripts
+      const fbScripts = document.querySelectorAll('script[src*="fbevents"]');
+      console.log('📊 Number of fbevents scripts:', fbScripts.length);
+      
+      // Check for other tracking pixels that might conflict
+      const allScripts = document.querySelectorAll('script');
+      const trackingScripts = Array.from(allScripts).filter(script => 
+        script.src && (
+          script.src.includes('facebook') || 
+          script.src.includes('gtag') || 
+          script.src.includes('analytics') ||
+          script.src.includes('pixel')
+        )
+      );
+      console.log('📊 All tracking scripts:', trackingScripts.map(s => s.src));
+      
+      // Test if pixel is responsive
+      if (window.fbq) {
+        console.log('🧪 Testing pixel responsiveness...');
+        window.fbq('track', 'PageView', { test_event: true });
+        console.log('🧪 Test PageView sent');
+      }
+      
+    }, 3000); // Wait 3 seconds for everything to load
   });
-  }, []);
+}, []);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
