@@ -612,7 +612,7 @@ export default function Necklaces() {
           <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-8 shadow-lg">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-playfair font-semibold text-black mb-4">
-                Preserving Your Necklace's Beauty
+                Preserving Your Necklace&rsquo;s Beauty
               </h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Simple care rituals to ensure your necklaces remain as stunning as the day you received them
