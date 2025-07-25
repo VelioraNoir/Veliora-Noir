@@ -39,7 +39,7 @@ export default function FAQ() {
     {
       category: "General",
       question: "What materials do you use?",
-      answer: "We work with premium metals including sterling silver, gold-filled, and platinum. All pieces are nickel-free and hypoallergenic. Our collection features handcrafted metallic accessories with sophisticated finishes that are designed to last and maintain their beauty over time."
+      answer: "We work with premium metals including sterling silver, gold-filled, and platinum. All pieces are nickel-free and hypoallergenic. Our collection features premium metallic accessories with sophisticated finishes that are designed to last and maintain their beauty over time."
     },
     
     // Products & Quality
@@ -63,7 +63,7 @@ export default function FAQ() {
     {
       category: "Ordering",
       question: "What's your return policy?",
-      answer: "All sales are final. Due to the exclusive nature of our handcrafted pieces and our commitment to maintaining the highest standards of hygiene and authenticity, we do not accept returns or exchanges. However, we will work with you to resolve any issues with manufacturing defects or shipping damage."
+      answer: "All sales are final. Due to the exclusive nature of our premium pieces and our commitment to maintaining the highest standards of hygiene and authenticity, we do not accept returns or exchanges. However, we will work with you to resolve any issues with manufacturing defects or shipping damage."
     },
     {
       category: "Ordering",

@@ -216,25 +216,6 @@ export default function Necklaces() {
               
               {/* Luxury CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center animate-fade-in-up delay-600">
-                <button 
-                  className="group relative overflow-hidden bg-black text-white px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:bg-gray-900 hover:shadow-xl hover:scale-105"
-                  onClick={() => analytics.trackEvent('necklaces_hero_cta', { cta_type: 'layering_guide' })}
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Layering Guide
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
-                
-                <button 
-                  className="group border-2 border-gray-300 text-gray-900 px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:border-black hover:bg-black hover:text-white hover:shadow-xl"
-                  onClick={() => analytics.trackEvent('necklaces_hero_cta', { cta_type: 'shop_now' })}
-                >
-                  Shop Now
-                </button>
               </div>
               
               {/* Urgency Indicators */}
@@ -515,21 +496,21 @@ export default function Necklaces() {
                 occasion: "Anniversary Gift",
                 text: "My husband gave me this delicate pendant for our anniversary. It's so beautifully crafted and I haven't taken it off since. The chain feels luxurious and the pendant catches the light perfectly.",
                 rating: 5,
-                image: "👩‍🦳"
+                image: "/AI people/women7.png"
               },
               {
                 name: "Sophia Williams",
                 occasion: "Birthday Present",
                 text: "I bought this statement necklace for my birthday and it's become my signature piece. Every time I wear it, I get compliments. The quality is exceptional and it elevates every outfit.",
                 rating: 5,
-                image: "👩‍🎨"
+                image: "/AI people/girl1.png"
               },
               {
                 name: "Grace Thompson",
                 occasion: "Wedding Day",
                 text: "I wore this vintage-inspired necklace on my wedding day and felt like a queen. It was the perfect complement to my dress and I'll treasure it forever. Pure elegance!",
                 rating: 5,
-                image: "👰"
+                image: "/AI people/women3.png"
               }
             ].map((testimonial, index) => (
               <div key={index} className="bg-gradient-to-br from-rose-50 to-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300">
@@ -546,8 +527,8 @@ export default function Necklaces() {
                 </p>
                 
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-rose-100 to-rose-200 rounded-full flex items-center justify-center mr-4 text-xl">
-                    {testimonial.image}
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src={testimonial.image} alt={testimonial.name} width={48} height={48} className="object-cover w-full h-full" />
                   </div>
                   <div>
                     <div className="font-semibold text-black">{testimonial.name}</div>
@@ -560,51 +541,6 @@ export default function Necklaces() {
         </div>
       </section>
 
-      {/* Layering & Styling Guide */}
-      <section className="px-8 pb-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-amber-50 via-white to-rose-50 rounded-3xl p-12 border border-gray-200 shadow-lg">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-semibold text-black mb-4">The Art of Layering</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Create your unique style by masterfully combining our necklaces
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  title: "Start Simple",
-                  description: "Begin with a delicate chain as your foundation piece"
-                },
-                {
-                  title: "Vary Lengths",
-                  description: "Mix short, medium, and long pieces for visual interest"
-                },
-                {
-                  title: "Add Focal Points",
-                  description: "Include one statement piece to anchor your look"
-                },
-                {
-                  title: "Balance Textures",
-                  description: "Combine smooth chains with textured or pendant pieces"
-                }
-              ].map((tip, index) => (
-                <div key={index} className="text-center">
-                  <h3 className="text-lg font-semibold text-black mb-2">{tip.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{tip.description}</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className="text-center mt-12">
-              <button className="bg-black text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-900 transition-all duration-300 hover:shadow-xl">
-                Explore Collection
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Care & Maintenance */}
       <section className="px-8 pb-20">

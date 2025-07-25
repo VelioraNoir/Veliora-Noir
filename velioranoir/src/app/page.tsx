@@ -227,6 +227,30 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
         
+        {/* Product badges similar to collection pages */}
+        <div className="absolute top-4 left-4 space-y-2">
+          {index < 3 && (
+            <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+              BESTSELLER
+            </div>
+          )}
+          {Math.random() > 0.6 && (
+            <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+              ONLY {Math.floor(Math.random() * 5) + 2} LEFT
+            </div>
+          )}
+          {index === 1 && (
+            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+              NEW ARRIVAL
+            </div>
+          )}
+          {index === 2 && (
+            <div className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+              LIMITED EDITION
+            </div>
+          )}
+        </div>
+        
         {/* FIXED Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
@@ -370,7 +394,7 @@ const HeroSection = () => {
               </p>
               
               <p className="text-lg text-gray-600 animate-fade-in-up delay-400 max-w-lg">
-                Handcrafted metallic accessories designed for those who appreciate 
+                Premium metallic accessories designed for those who appreciate 
                 the finest details and exceptional quality.
               </p>
             </div>
@@ -414,7 +438,7 @@ const HeroSection = () => {
                 <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Handcrafted</span>
+                <span>Premium Quality</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -433,7 +457,7 @@ const HeroSection = () => {
             
             <div className="relative aspect-square bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-3xl overflow-hidden shadow-2xl border border-gray-100/50">
               <Image 
-                src="/images/hero-jewelry.png" 
+                src="/images/ChatGPT Image Jul 25, 2025, 08_14_28 AM.png" 
                 alt="Elegant jewelry collection showcase featuring luxury accessories"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700"
@@ -658,7 +682,7 @@ useEffect(() => {
                   <p className="text-xl">
                     Born from a passion for <span className="text-black font-semibold">exceptional artistry</span>, 
                     Veliora Noir represents the pinnacle of luxury jewelry design. Each piece is 
-                    meticulously handcrafted by master artisans who have dedicated their lives to 
+                    meticulously crafted by master artisans who have dedicated their lives to 
                     perfecting the ancient art of metalwork.
                   </p>
                   
@@ -856,7 +880,7 @@ useEffect(() => {
                     </div>
                     
                     <div className="absolute bottom-8 left-8 bg-black/90 backdrop-blur-sm text-white rounded-2xl p-4 shadow-lg">
-                      <div className="text-sm font-medium">Handcrafted</div>
+                      <div className="text-sm font-medium">Premium Quality</div>
                       <div className="text-xs text-gray-300">Since 1890</div>
                     </div>
                   </div>
@@ -965,20 +989,6 @@ useEffect(() => {
                   </div>
                 </div>
 
-                {/* Lifetime Warranty */}
-                <div className="group">
-                  <div className="flex items-start gap-6 p-8 rounded-2xl border border-white/10 backdrop-blur-sm hover:border-yellow-400/30 transition-all duration-500">
-                    <div className="w-1 h-16 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full flex-shrink-0 mt-2" />
-                    <div>
-                      <h3 className="text-2xl font-semibold text-white mb-4 tracking-wide">Lifetime Craftsmanship Guarantee</h3>
-                      <p className="text-gray-300 leading-relaxed text-lg">
-                        Our unwavering commitment to excellence includes comprehensive lifetime coverage 
-                        for all craftsmanship defects and materials.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Secure Payments */}
                 <div className="group">
                   <div className="flex items-start gap-6 p-8 rounded-2xl border border-white/10 backdrop-blur-sm hover:border-yellow-400/30 transition-all duration-500">
@@ -1010,33 +1020,6 @@ useEffect(() => {
                   </div>
                 </div>
 
-                {/* Expert Consultation */}
-                <div className="group">
-                  <div className="flex items-start gap-6 p-8 rounded-2xl border border-white/10 backdrop-blur-sm hover:border-yellow-400/30 transition-all duration-500">
-                    <div className="w-1 h-16 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full flex-shrink-0 mt-2" />
-                    <div>
-                      <h3 className="text-2xl font-semibold text-white mb-4 tracking-wide">Personal Jewelry Concierge</h3>
-                      <p className="text-gray-300 leading-relaxed text-lg">
-                        Dedicated consultants available for private appointments, 
-                        styling guidance, and bespoke recommendations tailored to your preferences.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Gift Services */}
-                <div className="group">
-                  <div className="flex items-start gap-6 p-8 rounded-2xl border border-white/10 backdrop-blur-sm hover:border-yellow-400/30 transition-all duration-500">
-                    <div className="w-1 h-16 bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full flex-shrink-0 mt-2" />
-                    <div>
-                      <h3 className="text-2xl font-semibold text-white mb-4 tracking-wide">Exquisite Gift Services</h3>
-                      <p className="text-gray-300 leading-relaxed text-lg">
-                        Signature presentation in handcrafted gift boxes with personalized engravings 
-                        and special occasion delivery coordination.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -1114,8 +1097,8 @@ useEffect(() => {
                   &ldquo;Absolutely stunning pieces! The craftsmanship is impeccable and the customer service was outstanding. My necklace arrived beautifully packaged and exceeded all my expectations.&rdquo;
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mr-4 border border-gray-300">
-                    <span className="text-gray-700 font-semibold">SM</span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src="/AI people/women2.png" alt="Sarah Martinez" width={48} height={48} className="object-cover w-full h-full" />
                   </div>
                   <div>
                     <div className="font-semibold text-black">Sarah Martinez</div>
@@ -1137,8 +1120,8 @@ useEffect(() => {
                   &ldquo;I&rsquo;ve purchased multiple pieces from Veliora Noir and each one is a masterpiece. The attention to detail and quality is unmatched. Fast shipping and secure packaging too!&rdquo;
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full flex items-center justify-center mr-4 border border-gray-300">
-                    <span className="text-yellow-700 font-semibold">EW</span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src="/AI people/women3.png" alt="Emily Wilson" width={48} height={48} className="object-cover w-full h-full" />
                   </div>
                   <div>
                     <div className="font-semibold text-black">Emily Wang</div>
@@ -1160,8 +1143,8 @@ useEffect(() => {
                   &ldquo;The perfect engagement ring! My fiancé absolutely loves it. The diamond quality is exceptional and the design is both modern and timeless. Highly recommended!&rdquo;
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-black to-gray-800 rounded-full flex items-center justify-center mr-4 border border-gray-300">
-                    <span className="text-white font-semibold">MJ</span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src="/AI people/women4.png" alt="Michael Chen" width={48} height={48} className="object-cover w-full h-full" />
                   </div>
                   <div>
                     <div className="font-semibold text-black">Michael Johnson</div>
