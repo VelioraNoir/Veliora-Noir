@@ -136,7 +136,7 @@ export default function Collections() {
       <section className="px-8 pb-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {collections.map((collection, index) => (
+            {collections.map((collection) => (
               <Link 
                 key={collection.name}
                 href={collection.href}
