@@ -11,23 +11,19 @@ export default function About() {
   const brandValues = [
     {
       title: "Curated Excellence",
-      description: "Every piece in our collection is carefully selected for its exceptional design, quality, and timeless appeal.",
-      icon: "🔍"
+      description: "Every piece in our collection is carefully selected for its exceptional design, quality, and timeless appeal."
     },
     {
       title: "Accessible Luxury",
-      description: "We believe luxury should be attainable. Our curated selection offers premium styling at accessible prices.",
-      icon: "✨"
+      description: "We believe luxury should be attainable. Our curated selection offers premium styling at accessible prices."
     },
     {
       title: "Effortless Elegance",
-      description: "From selection to delivery, we've designed every touchpoint to be as elegant as the jewelry itself.",
-      icon: "💫"
+      description: "From selection to delivery, we've designed every touchpoint to be as elegant as the jewelry itself."
     },
     {
       title: "Customer Obsessed",
-      description: "Your satisfaction is our priority. We're here to help you find the perfect piece for every occasion.",
-      icon: "💎"
+      description: "Your satisfaction is our priority. We're here to help you find the perfect piece for every occasion."
     }
   ];
 
@@ -119,7 +115,6 @@ export default function About() {
                 }`}
                 onClick={() => setActiveValue(index)}
               >
-                <div className="text-4xl mb-4">{value.icon}</div>
                 <h3 className="text-xl font-playfair font-semibold text-black mb-4">
                   {value.title}
                 </h3>
@@ -189,8 +184,8 @@ export default function About() {
                 
                 <div className="space-y-4 mt-8">
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-gray-200">
+                      <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -201,8 +196,8 @@ export default function About() {
                   </div>
                   
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-gray-200">
+                      <svg className="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -213,8 +208,8 @@ export default function About() {
                   </div>
                   
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-gray-200">
+                      <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </div>

@@ -293,8 +293,13 @@ export default function ProductPage() {
                   {product.title}
                 </h1>
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="text-3xl font-semibold text-gray-900">
+                  {/* Original price crossed out */}
+                  <span className="text-2xl font-medium text-gray-400 line-through">
                     ${parseFloat(price).toFixed(2)}
+                  </span>
+                  {/* Discounted price (20% off) */}
+                  <span className="text-3xl font-semibold text-gray-900">
+                    ${(parseFloat(price) * 0.8).toFixed(2)}
                   </span>
                   {!isAvailable && (
                     <span className="px-3 py-1 bg-red-100 text-red-700 text-sm rounded-full">
@@ -409,7 +414,7 @@ export default function ProductPage() {
                   <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
-                  <p className="text-sm text-gray-600">Free Shipping</p>
+                  <p className="text-sm text-gray-600">Fast Shipping</p>
                 </div>
                 <div className="text-center">
                   <svg className="w-8 h-8 mx-auto mb-2 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -464,7 +469,7 @@ export default function ProductPage() {
                     </svg>
                   </summary>
                   <div className="mt-4 text-gray-600 space-y-2">
-                    <p>• Free shipping</p>
+                    <p>• Fast shipping</p>
                     <p>• 30-day return window</p>
                     <p>• Free returns on all orders</p>
                   </div>
@@ -518,7 +523,7 @@ export default function ProductPage() {
                 Added to Cart
               </h3>
               <p className="text-sm text-gray-600 mb-1">{product.title}</p>
-              <p className="text-xs text-gray-500">Quantity: {quantity} • ${(parseFloat(price) * quantity).toFixed(2)}</p>
+              <p className="text-xs text-gray-500">Quantity: {quantity} • ${(parseFloat(price) * 0.8 * quantity).toFixed(2)}</p>
               <div className="mt-4 flex gap-2">
                 <button 
                   onClick={() => setShowAddedFeedback(false)}

@@ -63,9 +63,16 @@ export default function ProductCard({
         )}
         
         <div className="flex items-center justify-between mb-4">
-          <p className="text-2xl font-semibold text-metallic-gold-500">
-            ${parseFloat(price).toFixed(2)}
-          </p>
+          <div className="flex items-center gap-3">
+            {/* Original price crossed out */}
+            <p className="text-lg font-medium text-gray-400 line-through">
+              ${parseFloat(price).toFixed(2)}
+            </p>
+            {/* Discounted price (20% off) */}
+            <p className="text-2xl font-semibold text-metallic-gold-500">
+              ${(parseFloat(price) * 0.8).toFixed(2)}
+            </p>
+          </div>
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <svg 
