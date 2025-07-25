@@ -25,7 +25,7 @@ const playfairSC = Playfair_Display_SC({
 export const metadata: Metadata = {
   title: "Veliora Noir - Luxury Metallic Accessories",
   description: "Discover our exquisite collection of premium metallic accessories crafted with unparalleled attention to detail. Experience luxury jewelry in stunning 3D.",
-  keywords: "luxury accessories, metallic jewelry, premium design, sophisticated style, handcrafted accessories, 3D jewelry viewer, luxury rings, necklaces, bracelets, earrings",
+  keywords: "luxury accessories, metallic jewelry, premium design, sophisticated style, premium accessories, 3D jewelry viewer, luxury rings, necklaces, bracelets, earrings",
   authors: [{ name: "Veliora Noir" }],
   robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
   openGraph: {

@@ -217,25 +217,6 @@ export default function Earrings() {
               
               {/* Luxury CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center animate-fade-in-up delay-600">
-                <button 
-                  className="group relative overflow-hidden bg-black text-white px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:bg-gray-900 hover:shadow-xl hover:scale-105"
-                  onClick={() => analytics.trackEvent('earrings_hero_cta', { cta_type: 'face_shape_guide' })}
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Face Shape Guide
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
-                
-                <button 
-                  className="group border-2 border-gray-300 text-gray-900 px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:border-black hover:bg-black hover:text-white hover:shadow-xl"
-                  onClick={() => analytics.trackEvent('earrings_hero_cta', { cta_type: 'shop_now' })}
-                >
-                  Shop Now
-                </button>
               </div>
               
               {/* Security & Trust Badges */}
@@ -604,21 +585,24 @@ export default function Earrings() {
                 verified: true,
                 text: "These earrings are absolutely gorgeous! I have very sensitive ears and these caused no irritation at all. The quality is amazing and they arrive in beautiful packaging.",
                 rating: 5,
-                product: "Diamond Stud Earrings"
+                product: "Diamond Stud Earrings",
+                image: "/AI people/women2.png"
               },
               {
                 name: "Amanda Foster",
                 verified: true,
                 text: "I've been wearing these hoops daily for 6 months and they still look brand new. The hypoallergenic posts are a game-changer for my sensitive ears!",
                 rating: 5,
-                product: "Gold Hoop Earrings"
+                product: "Gold Hoop Earrings",
+                image: "/AI people/women4.png"
               },
               {
                 name: "Rachel Kim",
                 verified: true,
                 text: "The customer service is exceptional and the earrings exceeded my expectations. Fast shipping and the packaging made it feel like a luxury experience.",
                 rating: 5,
-                product: "Pearl Drop Earrings"
+                product: "Pearl Drop Earrings",
+                image: "/AI people/women5.png"
               }
             ].map((review, index) => (
               <div key={index} className="bg-gradient-to-br from-purple-50 to-white border border-gray-200 rounded-2xl p-8 shadow-sm">
@@ -639,9 +623,14 @@ export default function Earrings() {
                   &ldquo;{review.text}&rdquo;
                 </p>
                 
-                <div>
-                  <div className="font-semibold text-black">{review.name}</div>
-                  <div className="text-sm text-gray-500">{review.product}</div>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src={review.image} alt={review.name} width={48} height={48} className="object-cover w-full h-full" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-black">{review.name}</div>
+                    <div className="text-sm text-gray-500">{review.product}</div>
+                  </div>
                 </div>
               </div>
             ))}

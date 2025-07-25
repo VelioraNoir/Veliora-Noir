@@ -444,7 +444,7 @@ export default function ProductPage() {
                     </svg>
                   </summary>
                   <div className="mt-4 text-gray-600 space-y-2">
-                    <p>• Handcrafted with premium materials</p>
+                    <p>• Crafted with premium materials</p>
                     <p>• Hypoallergenic and tarnish-resistant</p>
                     <p>• Includes luxury gift packaging</p>
                     <p>• Certificate of authenticity included</p>

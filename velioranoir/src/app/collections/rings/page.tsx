@@ -185,7 +185,7 @@ export default function Rings() {
                 </p>
                 
                 <p className="text-lg text-gray-600 animate-fade-in-up delay-400 max-w-lg">
-                  Handcrafted by master artisans using ethically sourced materials and 
+                  Crafted by master artisans using ethically sourced materials and 
                   time-honored techniques passed down through generations.
                 </p>
               </div>
@@ -528,21 +528,21 @@ export default function Rings() {
                 occasion: "Engagement",
                 text: "The ring was absolutely perfect! The craftsmanship is incredible and Michael's proposal was unforgettable. We get compliments everywhere we go.",
                 rating: 5,
-                image: "👰‍♀️"
+                image: "/AI people/women5.png"
               },
               {
                 name: "Emma & James",
                 occasion: "Wedding Bands",
                 text: "We chose matching bands and they're stunning. The comfort fit is amazing and the quality exceeded our expectations. Worth every penny!",
                 rating: 5,
-                image: "💑"
+                image: "/AI people/man1.png"
               },
               {
                 name: "Lisa & David",
                 occasion: "Anniversary",
                 text: "For our 10th anniversary, David surprised me with a beautiful eternity band. The diamonds are so brilliant and it pairs perfectly with my engagement ring.",
                 rating: 5,
-                image: "💕"
+                image: "/AI people/women6.png"
               }
             ].map((testimonial, index) => (
               <div key={index} className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300">
@@ -559,8 +559,8 @@ export default function Rings() {
                 </p>
                 
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full flex items-center justify-center mr-4 text-xl">
-                    {testimonial.image}
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src={testimonial.image} alt={testimonial.name} width={48} height={48} className="object-cover w-full h-full" />
                   </div>
                   <div>
                     <div className="font-semibold text-black">{testimonial.name}</div>

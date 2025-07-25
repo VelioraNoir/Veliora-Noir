@@ -230,12 +230,6 @@ export default function Bracelets() {
                   <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </button>
                 
-                <button 
-                  className="group border-2 border-gray-300 text-gray-900 px-8 py-4 rounded-xl font-medium transition-all duration-300 hover:border-black hover:bg-black hover:text-white hover:shadow-xl"
-                  onClick={() => analytics.trackEvent('bracelets_hero_cta', { cta_type: 'shop_now' })}
-                >
-                  Shop Now
-                </button>
               </div>
               
               {/* Security & Trust Badges */}
@@ -579,21 +573,24 @@ export default function Bracelets() {
                 verified: true,
                 text: "This tennis bracelet is absolutely stunning! The adjustable clasp fits perfectly and I get compliments every time I wear it. The quality exceeded my expectations.",
                 rating: 5,
-                product: "Diamond Tennis Bracelet"
+                product: "Diamond Tennis Bracelet",
+                image: "/AI people/women6.png"
               },
               {
                 name: "Maria Rodriguez",
                 verified: true,
                 text: "I love how this charm bracelet tells my story. Each charm is beautifully crafted and the adjustable sizing means it's comfortable all day. Such thoughtful design!",
                 rating: 5,
-                product: "Personalized Charm Bracelet"
+                product: "Personalized Charm Bracelet",
+                image: "/AI people/women7.png"
               },
               {
                 name: "Jennifer Liu",
                 verified: true,
                 text: "The gold chain bracelet is my go-to accessory. It's elegant enough for work and special occasions. The quality is exceptional and I wear it daily.",
                 rating: 5,
-                product: "Gold Chain Bracelet"
+                product: "Gold Chain Bracelet",
+                image: "/AI people/man2.png"
               }
             ].map((review, index) => (
               <div key={index} className="bg-gradient-to-br from-amber-50 to-white border border-gray-200 rounded-2xl p-8 shadow-sm">
@@ -614,9 +611,14 @@ export default function Bracelets() {
                   &ldquo;{review.text}&rdquo;
                 </p>
                 
-                <div>
-                  <div className="font-semibold text-black">{review.name}</div>
-                  <div className="text-sm text-gray-500">{review.product}</div>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border border-gray-300">
+                    <Image src={review.image} alt={review.name} width={48} height={48} className="object-cover w-full h-full" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-black">{review.name}</div>
+                    <div className="text-sm text-gray-500">{review.product}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -676,11 +678,6 @@ export default function Bracelets() {
               </div>
             </div>
             
-            <div className="text-center mt-12">
-              <button className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300">
-                Shop Securely Now
-              </button>
-            </div>
           </div>
         </div>
       </section>
