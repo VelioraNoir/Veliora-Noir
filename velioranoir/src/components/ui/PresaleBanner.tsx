@@ -80,31 +80,27 @@ export default function NewsletterBanner({
 
               {/* Main headline */}
               <h3 className="text-lg sm:text-xl font-playfair font-medium tracking-wide leading-tight">
-                Join our community for{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white font-semibold">
+                Subscribe for{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100 font-semibold">
                   30% off your first order
                 </span>
               </h3>
 
               {/* Subtext */}
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                Subscribe to our newsletter below for exclusive access to new collections, 
-                styling insights, and a special discount code sent instantly
+                Join our exclusive newsletter for early access to new collections, 
+                luxury styling insights, and your instant 30% discount code
               </p>
 
-              {/* Discount offers */}
+              {/* Single focused offer */}
               <div className="space-y-2">
-                <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-200">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-200 font-semibold">
-                    Newsletter subscribers get 30% off
+                <div className="flex items-center justify-center gap-2 text-sm sm:text-base">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100 font-semibold">
+                    Exclusive 30% Off Code
                   </span>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-400">
-                  <span>Or use</span>
-                  <code className="px-2 py-1 bg-white/10 rounded border border-white/20 font-mono text-white tracking-wider">
-                    VELIORANOIR20
-                  </code>
-                  <span>for 20% off (no signup required)</span>
+                <div className="text-xs text-gray-400">
+                  Sign up below to receive your exclusive discount code instantly
                 </div>
               </div>
 
@@ -123,8 +119,8 @@ export default function NewsletterBanner({
 
               {/* Fine print */}
               <p className="text-xs text-gray-500 max-w-lg mx-auto">
-                Newsletter subscribers receive exclusive 30% discount code via email. 
-                VELIORANOIR20 available to all customers. Cannot combine codes.
+                Receive your exclusive 30% discount code instantly upon signup. 
+                Valid for 30 days. Cannot be combined with other offers.
               </p>
             </div>
           </div>
