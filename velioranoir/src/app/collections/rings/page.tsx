@@ -167,7 +167,7 @@ export default function Rings() {
               {/* Exclusive Badge */}
               <div className="inline-flex items-center gap-2 bg-black/5 backdrop-blur-sm rounded-full px-6 py-3 text-sm text-gray-700 animate-fade-in-up">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                <span className="font-medium">Exclusive Ring Collection • Limited Edition</span>
+                <span className="font-medium">Exclusive Ring Collection</span>
               </div>
               
               <div className="space-y-6">
@@ -231,15 +231,6 @@ export default function Rings() {
                 </button>
               </div>
               
-              {/* Urgency Indicators */}
-              <div className="space-y-3 animate-fade-in-up delay-700">
-                <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 rounded-full px-4 py-2 inline-flex">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="font-medium">Limited Holiday Collection - Only 48 hours left</span>
-                </div>
-              </div>
             </div>
 
             {/* Enhanced Hero Showcase */}
@@ -274,12 +265,6 @@ export default function Rings() {
                 />
                 
                 {/* Premium floating elements */}
-                <div className="absolute top-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/50">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium text-gray-800">In Stock & Ready</span>
-                  </div>
-                </div>
                 
                 <div className="absolute bottom-8 left-8 bg-black/90 backdrop-blur-sm text-white rounded-2xl p-4 shadow-xl">
                   <div className="text-sm font-medium">Starting from</div>
@@ -288,7 +273,6 @@ export default function Rings() {
                 
                 <div className="absolute top-1/2 left-8 bg-yellow-500 text-black rounded-2xl p-3 shadow-xl transform -translate-y-1/2">
                   <div className="text-xs font-bold">20% OFF</div>
-                  <div className="text-xs">Limited Time</div>
                 </div>
               </div>
             </div>

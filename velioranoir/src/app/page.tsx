@@ -244,11 +244,6 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               NEW ARRIVAL
             </div>
           )}
-          {index === 2 && (
-            <div className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-              LIMITED EDITION
-            </div>
-          )}
         </div>
         
         {/* FIXED Wishlist Button */}

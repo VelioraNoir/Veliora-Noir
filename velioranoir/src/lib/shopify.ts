@@ -16,6 +16,10 @@ interface GraphQLVariant {
     amount: string;
     currencyCode: string;
   };
+  selectedOptions: Array<{
+    name: string;
+    value: string;
+  }>;
 }
 
 interface GraphQLProduct {
@@ -52,7 +56,14 @@ export interface Product {
   title: string;
   description: string;
   images: Array<{ src: string; altText?: string; width?: number; height?: number }>;
-  variants: Array<{ id: string; price: string; currencyCode: string; title: string; available: boolean }>;
+  variants: Array<{ 
+    id: string; 
+    price: string; 
+    currencyCode: string; 
+    title: string; 
+    available: boolean;
+    options: Array<{ name: string; value: string }>;
+  }>;
   vendor?: string;
   productType?: string;
   tags: string[];
@@ -128,6 +139,10 @@ const PRODUCTS_QUERY = `
                   amount
                   currencyCode
                 }
+                selectedOptions {
+                  name
+                  value
+                }
               }
             }
           }
@@ -165,6 +180,10 @@ const PRODUCT_QUERY = `
             price {
               amount
               currencyCode
+            }
+            selectedOptions {
+              name
+              value
             }
           }
         }
@@ -249,6 +268,7 @@ export async function getAllProducts(): Promise<Product[]> {
           currencyCode: variantEdge.node.price.currencyCode,
           title: variantEdge.node.title,
           available: variantEdge.node.availableForSale,
+          options: variantEdge.node.selectedOptions || [],
         })),
         vendor: product.vendor,
         productType: product.productType,
@@ -294,6 +314,7 @@ export async function getProduct(id: string): Promise<Product | null> {
         currencyCode: variantEdge.node.price.currencyCode,
         title: variantEdge.node.title,
         available: variantEdge.node.availableForSale,
+        options: variantEdge.node.selectedOptions || [],
       })),
       vendor: product.vendor,
       productType: product.productType,

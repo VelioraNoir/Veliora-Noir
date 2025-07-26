@@ -31,7 +31,7 @@ export default function Collections() {
       href: '/collections/bracelets', 
       description: 'Refined wrist accessories in premium materials',
       image: '/images/bracelet.png',
-      featured: 'Limited Edition',
+      featured: 'Bestseller',
       startingPrice: '$39.99',
       pieces: '12+ designs'
     },

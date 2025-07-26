@@ -342,6 +342,80 @@ export default function ProductPage() {
                 </div>
               )}
 
+              {/* Size/Variant Selection */}
+              {product.variants.length > 1 && (
+                <div>
+                  {(() => {
+                    // Determine the option type from the first variant
+                    const firstVariant = product.variants[0];
+                    const optionName = firstVariant?.options?.[0]?.name || 'Size';
+                    const isSize = optionName.toLowerCase().includes('size');
+                    const isColor = optionName.toLowerCase().includes('color') || optionName.toLowerCase().includes('colour');
+                    const isMaterial = optionName.toLowerCase().includes('material') || optionName.toLowerCase().includes('metal');
+                    
+                    return (
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        {isColor ? 'Color' : isMaterial ? 'Material' : isSize ? 'Size' : optionName}
+                        {selectedVariantData?.title && (
+                          <span className="text-sm text-gray-600 font-normal">
+                            {selectedVariantData.options?.[0]?.value 
+                              ? ` (Selected: ${selectedVariantData.options[0].value})`
+                              : ` (Selected: ${selectedVariantData.title})`
+                            }
+                          </span>
+                        )}
+                      </h3>
+                    );
+                  })()}
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {product.variants.map((variant) => (
+                      <button
+                        key={variant.id}
+                        onClick={() => {
+                          setSelectedVariant(variant.id);
+                          analytics.trackEvent('variant_selection', {
+                            product_id: product.id,
+                            product_name: product.title,
+                            variant_id: variant.id,
+                            variant_title: variant.title,
+                            variant_price: variant.price
+                          });
+                        }}
+                        disabled={!variant.available}
+                        className={`py-3 px-2 rounded-xl border font-medium text-sm transition-all duration-200 flex items-center justify-center ${
+                          selectedVariant === variant.id
+                            ? 'border-black bg-black text-white'
+                            : variant.available
+                            ? 'border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                            : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
+                        }`}
+                        data-luxury-action="variant_selection"
+                      >
+                        <span className="truncate">
+                          {variant.options?.[0]?.value || variant.title}
+                        </span>
+                        {!variant.available && (
+                          <span className="ml-1 text-xs">✕</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Price difference indicator */}
+                  {product.variants.length > 1 && selectedVariantData && (
+                    <div className="mt-3 text-sm text-gray-600">
+                      <span>Price for {selectedVariantData.options?.[0]?.value || selectedVariantData.title}: </span>
+                      <span className="font-semibold text-gray-900">
+                        ${(parseFloat(selectedVariantData.price) * 0.8).toFixed(2)}
+                      </span>
+                      <span className="line-through ml-2 text-gray-400">
+                        ${selectedVariantData.price}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Quantity */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Quantity</h3>
