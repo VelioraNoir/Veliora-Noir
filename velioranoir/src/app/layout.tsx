@@ -102,15 +102,32 @@ export default function RootLayout({
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              // Fix for Shopify checkout "Continue Shopping" redirect issue
+              // Fix for Shopify checkout + Purchase tracking redirect
               (function() {
                 try {
                   const referrer = document.referrer || '';
                   const currentUrl = window.location.href;
+                  const urlParams = new URLSearchParams(window.location.search);
                   
                   // Check if user came from Shopify checkout/thank you page
                   if (referrer.includes('myshopify.com') || 
                       referrer.includes('shopify.com')) {
+                    
+                    // If coming from Shopify thank you page, redirect to our thank-you page
+                    if (referrer.includes('/thank_you') || referrer.includes('/orders/')) {
+                      console.log('🎯 Purchase completed - redirecting to thank you page');
+                      
+                      // Extract order data from URL if available
+                      const orderData = {
+                        order_id: urlParams.get('order_id') || 'order_' + Date.now(),
+                        total: urlParams.get('total') || urlParams.get('first_name') || '0', // Shopify sometimes passes data in unexpected params
+                        referrer: 'shopify_checkout'
+                      };
+                      
+                      const thankYouUrl = '/thank-you?' + new URLSearchParams(orderData).toString();
+                      window.location.replace(thankYouUrl);
+                      return;
+                    }
                     
                     // Only redirect if we're not already on the right domain
                     if (!currentUrl.includes('velioranoir.com')) {
@@ -258,14 +275,15 @@ export default function RootLayout({
         {/* Facebook Pixel - noscript fallback */}
         {FACEBOOK_PIXEL_ID && (
           <noscript>
-  <img
-    height="1"
-    width="1"
-    style={{ display: 'none' }}
-    src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
-    alt=""
-  />
-</noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              height="1"
+              width="1"
+              style={{ display: 'none' }}
+              src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
         )}
 
         {/* Subtle metallic overlay for depth - FIXED: no horizontal overflow */}

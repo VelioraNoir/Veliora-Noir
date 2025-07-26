@@ -30,6 +30,32 @@ export async function POST(request: NextRequest) {
       );
       console.log('🛠 Using Shopify domain for reliable checkout:', checkoutUrl);
     }
+
+    // Add our thank-you page as the return URL with purchase tracking data
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://velioranoir.com' 
+      : 'http://localhost:3000';
+    
+    // Prepare purchase data for thank-you page
+    const purchaseData = {
+      order_id: checkout.id,
+      total: checkout.totalPrice,
+      item_count: lineItems.length,
+      items: encodeURIComponent(JSON.stringify(
+        lineItems.map((item: { variantId?: string; title?: string; quantity?: number }, index: number) => ({
+          id: item.variantId || `item_${index}`,
+          name: item.title || `Product ${index + 1}`,
+          quantity: item.quantity || 1,
+          price: parseFloat(checkout.totalPrice) / lineItems.length // Approximate price per item
+        }))
+      ))
+    };
+
+    const thankYouUrl = `${baseUrl}/thank-you?${new URLSearchParams(purchaseData).toString()}`;
+    
+    // Note: In a real implementation, you'd set this as the Shopify checkout's return URL
+    // For now, we'll include it in the response for manual redirect setup
+    console.log('📧 Thank you page URL:', thankYouUrl);
     
     console.log('✅ Checkout created successfully:', checkoutUrl);
 
@@ -37,7 +63,8 @@ export async function POST(request: NextRequest) {
       success: true,
       checkoutUrl: checkoutUrl,
       checkoutId: checkout.id,
-      total: checkout.totalPrice
+      total: checkout.totalPrice,
+      thankYouUrl: thankYouUrl // Include for potential future use
     });
 
   } catch (error) {
