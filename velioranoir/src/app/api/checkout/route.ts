@@ -37,16 +37,20 @@ export async function POST(request: NextRequest) {
       : 'http://localhost:3000';
     
     // Prepare purchase data for thank-you page
+    const totalAmount = typeof checkout.totalPrice === 'string' 
+      ? checkout.totalPrice 
+      : checkout.totalPrice.amount;
+    
     const purchaseData = {
       order_id: checkout.id,
-      total: checkout.totalPrice,
+      total: totalAmount,
       item_count: lineItems.length,
       items: encodeURIComponent(JSON.stringify(
         lineItems.map((item: { variantId?: string; title?: string; quantity?: number }, index: number) => ({
           id: item.variantId || `item_${index}`,
           name: item.title || `Product ${index + 1}`,
           quantity: item.quantity || 1,
-          price: parseFloat(checkout.totalPrice) / lineItems.length // Approximate price per item
+          price: parseFloat(totalAmount) / lineItems.length // Approximate price per item
         }))
       ))
     };
@@ -63,7 +67,7 @@ export async function POST(request: NextRequest) {
       success: true,
       checkoutUrl: checkoutUrl,
       checkoutId: checkout.id,
-      total: checkout.totalPrice,
+      total: totalAmount,
       thankYouUrl: thankYouUrl // Include for potential future use
     });
 
