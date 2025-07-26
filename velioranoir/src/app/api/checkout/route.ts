@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const purchaseData = {
       order_id: checkout.id,
       total: totalAmount,
-      item_count: lineItems.length,
+      item_count: lineItems.length.toString(),
       items: encodeURIComponent(JSON.stringify(
         lineItems.map((item: { variantId?: string; title?: string; quantity?: number }, index: number) => ({
           id: item.variantId || `item_${index}`,
