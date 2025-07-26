@@ -255,12 +255,6 @@ export default function Necklaces() {
                 />
                 
                 {/* Premium floating elements */}
-                <div className="absolute top-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/50">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium text-gray-800">Limited Edition</span>
-                  </div>
-                </div>
                 
                 <div className="absolute bottom-8 left-8 bg-black/90 backdrop-blur-sm text-white rounded-2xl p-4 shadow-xl">
                   <div className="text-sm font-medium">From</div>
